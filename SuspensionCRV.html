@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Suspensión Oficial y TPMS (Sec. 18)</title>
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --susp-orange: #f97316;
+      --susp-glow: rgba(249, 115, 22, 0.35);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --honda-red: #ef4444;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--susp-orange);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--susp-glow);
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(249, 115, 22, 0.2);
+      border-color: var(--susp-orange);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--susp-orange); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--susp-orange);
+      border-color: var(--susp-orange);
+      color: #000;
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--susp-orange);
+      color: #000;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">SUSP</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Suspensión y TPMS (Sección 18)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar amortiguador, buje, rótula, camber, torque, TPMS...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">🔩 Toda la Suspensión y TPMS</option>
+        <option value="ALIGN">📐 Geometría y Alineación de Ruedas</option>
+        <option value="FRONT">🚗 Suspensión Delantera (MacPherson)</option>
+        <option value="REAR">🚙 Suspensión Trasera (Multi-Link)</option>
+        <option value="TPMS">📡 TPMS (Sensores de Presión y Módulo)</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú Suspensión</button>
+        <span id="sheet-title">Página 18-24</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Oficial de Suspensión Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE SUSPENSIÓN Y TPMS (SECCIÓN 18 COMPLETA)
+    const suspension = [
+      { grupo: "FRONT", sec: "18-1", pag: 1224, titulo: "Índice de la Sección de Suspensión", desc: "Tabla de contenido de componentes delanteros, traseros, alineación y sistema TPMS." },
+      { grupo: "FRONT", sec: "18-2", pag: 1225, titulo: "Herramientas Especiales de Suspensión", desc: "Adaptador 07AAA-SVAA100, extractores de rótula 28/32mm 07MAC-SL0A102 y protectores de rosca." },
+      { grupo: "FRONT", sec: "18-3", pag: 1226, titulo: "Ubicación de Componentes: Delantera", desc: "Amortiguador MacPherson, horquilla inferior, barra estabilizadora, mangueta y masa." },
+      { grupo: "REAR", sec: "18-4", pag: 1227, titulo: "Ubicación de Componentes: Trasera", desc: "Amortiguador trasero, brazo superior, brazo de arrastre (trailing arm), barra estabilizadora y bujes." },
+      { grupo: "ALIGN", sec: "18-5", pag: 1228, titulo: "Especificaciones de Alineación de Ruedas", desc: "Camber del: 0°00'±30', Camber tras: -1°00'±45'. Caster: 3°02'±1°. Total Toe del: 0±2 mm, tras: 2 mm." },
+      { grupo: "ALIGN", sec: "18-8", pag: 1231, titulo: "Inspección de Juego Axial en Rodamientos", desc: "Juego axial máximo de baleros delantero y trasero con reloj comparador: 0.05 mm." },
+      { grupo: "ALIGN", sec: "18-9", pag: 1232, titulo: "Alabeo de Rueda (Runout) Aluminio y Acero", desc: "Límite radial/axial rines de aluminio: 2.0 mm axial, 1.5 mm radial. Rines de acero: 2.0 mm." },
+      { grupo: "ALIGN", sec: "18-10", pag: 1233, titulo: "Reemplazo de Birlos de Rueda (Wheel Bolts)", desc: "Procedimiento de expulsión y asentamiento con tuerca de sacrificio y arandelas." },
+      { grupo: "FRONT", sec: "18-11", pag: 1234, titulo: "Desacople de Rótula con Extractor Especial", desc: "Uso de extractor 07MAC-SL0A202 con protector de rosca para no dañar la bota de hule." },
+      { grupo: "FRONT", sec: "18-12", pag: 1235, titulo: "Desmontaje de Mangueta Delantera (Knuckle)", desc: "Desconexión de sensor de velocidad ABS, caliper de freno y rótulas de dirección." },
+      { grupo: "FRONT", sec: "18-16", pag: 1239, titulo: "Reemplazo del Balero Delantero con Prensa", desc: "Instalación de rodamiento con banda magnética del sensor ABS orientada hacia adentro." },
+      { grupo: "FRONT", sec: "18-18", pag: 1241, titulo: "Reemplazo de Rótula Inferior (Ball Joint)", desc: "Extracción e inserción de rótula a presión con herramienta 07GAF-SE00200." },
+      { grupo: "FRONT", sec: "18-19", pag: 1242, titulo: "Desmontaje de la Horquilla Inferior (Lower Arm)", desc: "Retiro de perno pasante delantero y buje vertical trasero del subchasis." },
+      { grupo: "FRONT", sec: "18-20", pag: 1243, titulo: "Instalación de Horquilla y Torques de Pernos", desc: "Perno delantero 12mm: 59 N·m. Perno trasero 14mm: 103 N·m (Apretar con peso del auto en el suelo)." },
+      { grupo: "FRONT", sec: "18-21", pag: 1244, titulo: "Bieletas Estabilizadoras Delanteras (Links)", desc: "Tuercas de brida 12x1.25mm: 78 N·m (58 lbf·ft) sosteniendo el centro con llave Allen." },
+      { grupo: "FRONT", sec: "18-22", pag: 1245, titulo: "Desmontaje de la Barra Estabilizadora Delantera", desc: "Sujeción del motor con puente AAR-T-12566 y descenso de 30 mm del subchasis." },
+      { grupo: "FRONT", sec: "18-24", pag: 1247, titulo: "Desmontaje del Conjunto Amortiguador/Resorte", desc: "Retiro de arnés ABS, manguera de freno y pernos pasantes inferiores del strut." },
+      { grupo: "FRONT", sec: "18-26", pag: 1249, titulo: "Instalación de Amortiguador y Torques Críticos", desc: "Pernos pasantes 16x1.5mm: 157 N·m (116 lbf·ft). Tuercas de torre 10mm: 44 N·m (33 lbf·ft)." },
+      { grupo: "FRONT", sec: "18-27", pag: 1250, titulo: "Despiece del Amortiguador Delantero (Strut)", desc: "Copela superior, rodamiento de giro (bearing), tope de rebote, resorte y amortiguador." },
+      { grupo: "FRONT", sec: "18-30", pag: 1253, titulo: "Armado de Amortiguador Delantero y Tuerca Central", desc: "Tuerca central autoblocante 12x1.25mm: 44 N·m (33 lbf·ft) usando útil 07AAA-SVAA100." },
+      { grupo: "REAR", sec: "18-31", pag: 1254, titulo: "Despiece de Mangueta y Masa Trasera (Hub Unit)", desc: "Masa balero con codificador magnético, zapatas de freno de mano y tuerca de flecha." },
+      { grupo: "REAR", sec: "18-32", pag: 1255, titulo: "Reemplazo de la Masa Balero Trasera (4WD y 2WD)", desc: "Desmontaje de caliper, disco/tambor y retiro de masa unida con 4 pernos." },
+      { grupo: "REAR", sec: "18-33", pag: 1256, titulo: "Torque de Tuerca de Espiga Trasera (Spindle Nut)", desc: "Tuerca 24x1.5mm (4WD): 245 N·m (181 lbf·ft) lubricada en el asiento y punzonada." },
+      { grupo: "REAR", sec: "18-34", pag: 1257, titulo: "Desmontaje de la Mangueta Trasera (Knuckle)", desc: "Desconexión de brazo superior, brazo de arrastre, amortiguador y zapatas de freno." },
+      { grupo: "REAR", sec: "18-35", pag: 1258, titulo: "Perno Excéntrico de Ajuste de Caída Trasera (Camber)", desc: "Perno excéntrico 14x1.5mm: 69 N·m (51 lbf·ft). Perno mangueta 12mm: 57 N·m." },
+      { grupo: "REAR", sec: "18-36", pag: 1259, titulo: "Reemplazo del Brazo Superior Trasero (Upper Arm)", desc: "Pernos de brida 12x1.25mm: 93 N·m (69 lbf·ft). Apretar con la suspensión cargada." },
+      { grupo: "REAR", sec: "18-37", pag: 1260, titulo: "Reemplazo del Brazo de Arrastre (Trailing Arm)", desc: "Pernos delanteros 12mm: 115 N·m (84.6 lbf·ft). Perno amortiguador: 93 N·m." },
+      { grupo: "REAR", sec: "18-38", pag: 1261, titulo: "Bieletas y Barra Estabilizadora Trasera", desc: "Bieletas: 39 N·m. Abrazaderas de barra estabilizadora 8mm: 22 N·m (16 lbf·ft)." },
+      { grupo: "REAR", sec: "18-39", pag: 1262, titulo: "Desmontaje del Amortiguador Trasero", desc: "Acceso a tuercas superiores retirando tapas laterales en el maletero." },
+      { grupo: "REAR", sec: "18-41", pag: 1264, titulo: "Instalación del Amortiguador Trasero", desc: "Tuercas superiores 10mm: 74 N·m (54 lbf·ft). Perno pasante inferior 14mm: 93 N·m." },
+      { grupo: "REAR", sec: "18-42", pag: 1265, titulo: "Despiece del Amortiguador Trasero", desc: "Bujes aisladores de hule, collarín metálico, funda guardapolvo y resorte." },
+      { grupo: "REAR", sec: "18-44", pag: 1267, titulo: "Armado y Tuerca Central de Amortiguador Trasero", desc: "Alineación de marca de pintura hacia afuera y tuerca central 10mm: 29 N·m (22 lbf·ft)." },
+      { grupo: "TPMS", sec: "18-45", pag: 1268, titulo: "Sistema TPMS: Descripción y Criterios", desc: "Monitoreo continuo de presión en las 4 llantas; umbral de aviso por baja presión." },
+      { grupo: "TPMS", sec: "18-46", pag: 1269, titulo: "Ubicación de Componentes del Sistema TPMS", desc: "Módulo receptor detrás de consola central, sensores en válvulas y antena." },
+      { grupo: "TPMS", sec: "18-50", pag: 1273, titulo: "Memorización de Sensores de Presión (ID Learning)", desc: "Procedimiento con herramienta de activación y escáner HDS para registrar IDs." },
+      { grupo: "TPMS", sec: "18-76", pag: 1299, titulo: "Reemplazo y Torque de Válvulas Sensoras TPMS", desc: "Tuerca externa de la válvula: 4 N·m (35 lbf·in). Reemplazar siempre ojillo de goma." }
+    ];
+
+    let itemsFiltrados = [...suspension];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas técnicas`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...suspension];
+      } else {
+        itemsFiltrados = suspension.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...suspension];
+      } else {
+        itemsFiltrados = suspension.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Abre por defecto en la instalación del amortiguador delantero (Pág. 1247 / Sec. 18-24)
+      const initIdx = suspension.findIndex(i => i.pag === 1247);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

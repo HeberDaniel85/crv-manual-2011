@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Sistemas de Retención SRS y Cinturones (Sec. 24)</title>
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --srs-red: #ef4444;
+      --srs-glow: rgba(239, 68, 68, 0.4);
+      --srs-yellow: #facc15;
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--srs-red);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--srs-glow);
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--srs-red);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--srs-red); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--srs-red);
+      border-color: var(--srs-red);
+      color: #fff;
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--srs-red);
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">RESTRAINTS</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Sistemas de Retención y SRS (Sec. 24)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar pretensor, bolsa, ODS, cable reel, sensor impacto, DTC...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">🛡️ Toda la Seguridad Pasiva (SRS)</option>
+        <option value="SAFETY">⚠️ Regla de 3 Minutos y Precauciones</option>
+        <option value="SEATBELT">🎗️ Cinturones de Seguridad y Pretensores</option>
+        <option value="AIRBAGS">🎈 Bolsas de Aire (Frontal, Lateral, Cortina)</option>
+        <option value="ODS_SENS">⚖️ Sensores de Impacto, Posición y ODS</option>
+        <option value="PINOUT_DTC">🔌 Pinouts 28P (A/B) y Diagnóstico DTC</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú SRS</button>
+        <span id="sheet-title">Página 24-15</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Oficial de Retenciones y SRS Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE RESTRAINTS & SRS (SECCIÓN 24 COMPLETA)
+    const sistemasRetencion = [
+      { grupo: "SAFETY", sec: "24-1", pag: 2134, titulo: "Índice de Sistemas de Retención y SRS", desc: "Tabla maestra: Herramientas especiales, cinturones de seguridad, bolsas de aire, ODS y DTCs." },
+      { grupo: "SAFETY", sec: "24-2", pag: 2135, titulo: "Herramientas Especiales SRS de Diagnóstico", desc: "Simulador de inflador 07SAZ-TB4011A, cables Lead J/K/L y cancelador de corto 070AZ-SAA0100." },
+      { grupo: "SEATBELT", sec: "24-3", pag: 2136, titulo: "Ubicación de Cinturones de Seguridad", desc: "Retractores pirotécnicos delanteros, hebillas tensoras, cinturón central trasero y anclajes." },
+      { grupo: "SEATBELT", sec: "24-4", pag: 2137, titulo: "Reemplazo de Cinturón Delantero (Paso 1)", desc: "Desconexión de batería (3 min), retiro de panel pilar B y conector amarillo de pretensor." },
+      { grupo: "SEATBELT", sec: "24-9", pag: 2142, titulo: "Torques de Anclajes de Cinturón Delantero", desc: "Perno inferior y superior 7/16-20 UNF: 32 N·m (24 lbf·ft). Aplicar traba química en rosca." },
+      { grupo: "SEATBELT", sec: "24-10", pag: 2143, titulo: "Hebilla con Pretensor de Asiento Delantero", desc: "Perno de sujeción 7/16-20 UNF: 32 N·m. Conector de 4 pines conectado al arnés de piso." },
+      { grupo: "SEATBELT", sec: "24-11", pag: 2144, titulo: "Inspección de Retractores y Traba de Inercia", desc: "Prueba de inclinación: traba libre a 15°, bloqueo completo a 40°. Mecanismo ALR para sillas de niño." },
+      { grupo: "AIRBAGS", sec: "24-13", pag: 2146, titulo: "Ubicación Maestra de Componentes SRS", desc: "Módulo central SRS, bolsa de piloto, copiloto, laterales, cortinas, pretensores y sensores de impacto." },
+      { grupo: "SAFETY", sec: "24-15", pag: 2148, titulo: "Protocolo de Seguridad: Regla de los 3 Minutos", desc: "Batería desconectada 3 min para vaciar condensadores. Usar solo multímetros digitales con corriente <10 mA." },
+      { grupo: "SAFETY", sec: "24-16", pag: 2149, titulo: "Alineación del Carrete de Cable (Cable Reel)", desc: "Centrado obligatorio del carrete antes de instalar volante para evitar ruptura de la cinta interna." },
+      { grupo: "SAFETY", sec: "24-18", pag: 2151, titulo: "Prohibición de Empalmes y Arnés Amarillo", desc: "Prohibido reparar o soldar cables amarillos del SRS. Sustitución obligatoria del arnés completo si se daña." },
+      { grupo: "SAFETY", sec: "24-19", pag: 2152, titulo: "Conectores con Bloqueo de Resorte (Spring-loaded)", desc: "Mecanismo de desacople retrayendo la camisa exterior sin tirar de los cables." },
+      { grupo: "SAFETY", sec: "24-20", pag: 2153, titulo: "Uso del Cancelador de Corto 070AZ-SAA0100", desc: "Apertura forzada de conectores A y B de la unidad SRS para mediciones con multímetro." },
+      { grupo: "ODS_SENS", sec: "24-28", pag: 2161, titulo: "Inicialización del Módulo ODS en Respaldo", desc: "Procedimiento con HDS tras reemplazar el módulo ODS o el sensor de respaldo del copiloto." },
+      { grupo: "ODS_SENS", sec: "24-29", pag: 2162, titulo: "Calibración de Celdas de Peso (SWS Calibration)", desc: "Alineación de cero con asiento desocupado. Error si hay peso superior a 5 kg en el asiento." },
+      { grupo: "ODS_SENS", sec: "24-31", pag: 2164, titulo: "Prueba del Sensor de Posición de Asiento Chofer", desc: "Monitoreo en riel: verifica si el conductor está muy adelantado para mitigar la fuerza del inflador." },
+      { grupo: "PINOUT_DTC", sec: "24-32", pag: 2165, titulo: "Índice Maestro DTC: Bolsas Laterales y Cortinas", desc: "DTC 31-xx (Bolsa piloto), 32-xx (Bolsa copiloto), 33-xx (Cortina izquierda), 34-xx (Cortina derecha)." },
+      { grupo: "PINOUT_DTC", sec: "24-33", pag: 2166, titulo: "Índice Maestro DTC: Sensores de Impacto", desc: "DTC 41/42 (Impacto frontal izq/der), 43/44 (Impacto lateral 1ro), 45/46 (Impacto lateral 2do)." },
+      { grupo: "PINOUT_DTC", sec: "24-34", pag: 2167, titulo: "Índice Maestro DTC: Unidad SRS y Hebillas", desc: "DTC 51 a 58 (Falla interna SRS), 61/62 (Switch de hebilla de cinturón piloto/copiloto)." },
+      { grupo: "PINOUT_DTC", sec: "24-35", pag: 2168, titulo: "Índice Maestro DTC: Módulo ODS y Despliegues", desc: "DTC 81 a 86 (Sensores SWS y ODS), DTC F1 a F4 (Registro permanente de impacto/despliegue)." },
+      { grupo: "AIRBAGS", sec: "24-39", pag: 2172, titulo: "Descripción del Sistema SRS y Lógica de Disparo", desc: "Activación coordinada de infladores según desaceleración, dirección del golpe y peso del copiloto." },
+      { grupo: "ODS_SENS", sec: "24-40", pag: 2173, titulo: "Testigos 'Side Airbag OFF' y 'Passenger Airbag OFF'", desc: "Umbral de 30 kg (65 lbs) para cancelar bolsa frontal derecha; detección de niño recargado en puerta." },
+      { grupo: "PINOUT_DTC", sec: "24-42", pag: 2175, titulo: "Pinout Unidad SRS: Conector A (28P)", desc: "Terminales de infladores frontales de 2 etapas (piloto y copiloto), comunicación F-CAN y tierra G505." },
+      { grupo: "PINOUT_DTC", sec: "24-43", pag: 2176, titulo: "Pinout Unidad SRS: Conector B (28P)", desc: "Terminales de pretensores de retractor (1-4), hebillas (7-10), bolsas laterales, cortinas y sensores de impacto." },
+      { grupo: "PINOUT_DTC", sec: "24-44", pag: 2177, titulo: "Diagrama Eléctrico General del Sistema SRS", desc: "Esquema de interconexión de todas las cargas pirotécnicas, sensores satélite y módulo central." },
+      { grupo: "PINOUT_DTC", sec: "24-58", pag: 2191, titulo: "Diagnóstico DTC 21-1x: Pretensor Conductor Abierto", desc: "Prueba con simulador 07SAZ-TB4011A (resistencia de 2.0 a 3.0 Ω en terminales 1 y 2 del conector B)." },
+      { grupo: "PINOUT_DTC", sec: "24-59", pag: 2192, titulo: "Diagnóstico DTC 21-3x: Corto en Pretensor Conductor", desc: "Medición de aislamiento: lectura debe indicar circuito abierto (OL) o al menos 1 MΩ." },
+      { grupo: "PINOUT_DTC", sec: "24-60", pag: 2193, titulo: "Diagnóstico DTC 21-8x: Corto a Batería (+B)", desc: "Voltaje en terminales 1 y 2 del arnés de piso debe ser menor o igual a 0.5 V con switch en ON." },
+      { grupo: "PINOUT_DTC", sec: "24-61", pag: 2194, titulo: "Diagnóstico DTC 21-9x: Corto a Masa (GND)", desc: "Resistencia a tierra de carrocería en terminales 1 y 2 debe indicar circuito abierto (OL) o >1 MΩ." },
+      { grupo: "PINOUT_DTC", sec: "24-62", pag: 2195, titulo: "Diagnóstico DTC 22-1x: Pretensor Copiloto Abierto", desc: "Prueba con simulador en conector de piso; resistencia en terminales 3 y 4 del conector B: 2.0 a 3.0 Ω." },
+      { grupo: "PINOUT_DTC", sec: "24-66", pag: 2199, titulo: "Diagnóstico DTC 27-1x: Pretensor Hebilla Piloto", desc: "Prueba de la hebilla pirotécnica; resistencia en terminales 7 y 8 del conector B: 2.0 a 3.0 Ω." },
+      { grupo: "PINOUT_DTC", sec: "24-70", pag: 2203, titulo: "Diagnóstico DTC 28-1x: Pretensor Hebilla Copiloto", desc: "Prueba de la hebilla pirotécnica derecha; resistencia en terminales 9 y 10 del conector B: 2.0 a 3.0 Ω." },
+      { grupo: "PINOUT_DTC", sec: "24-86", pag: 2219, titulo: "Diagnóstico DTC 33-1x: Cortina Izquierda Abierta", desc: "Prueba con simulador Lead L en conector 2P de techo; resistencia en terminales 21 y 22: 2.0 a 3.0 Ω." },
+      { grupo: "PINOUT_DTC", sec: "24-94", pag: 2227, titulo: "Diagnóstico DTC 34-1x: Cortina Derecha Abierta", desc: "Prueba con simulador Lead L en arnés de cortina; resistencia en terminales 23 y 24: 2.0 a 3.0 Ω." },
+      { grupo: "AIRBAGS", sec: "24-161", pag: 2294, titulo: "Reemplazo de la Bolsa de Aire del Volante", desc: "Retiro de cubiertas de columna, tornillos TORX T30 (9.8 N·m) y conector con traba de resorte." },
+      { grupo: "AIRBAGS", sec: "24-162", pag: 2295, titulo: "Reemplazo de la Bolsa de Aire del Copiloto", desc: "Desmontaje de guantera, pernos inferiores de soporte 6mm (9.8 N·m) y retiro hacia arriba del tablero." },
+      { grupo: "AIRBAGS", sec: "24-165", pag: 2298, titulo: "Reemplazo de Bolsas de Cortina en Techo", desc: "Retiro de guarnecido de pilares A, B y C, clips de expansión y pernos de fijación a 9.8 N·m." },
+      { grupo: "SAFETY", sec: "24-169", pag: 2302, titulo: "Protocolo de Desecho y Detonación de Airbags", desc: "Uso de la herramienta de despliegue 07HAZ-SG00500 en área abierta y despejada a más de 10 metros." },
+      { grupo: "SAFETY", sec: "24-173", pag: 2306, titulo: "Reemplazo e Instalación del Carrete de Cable", desc: "Pernos de fijación, centrado de 2.5 vueltas desde el tope y conexión a mandos de volante." },
+      { grupo: "AIRBAGS", sec: "24-176", pag: 2309, titulo: "Reemplazo del Módulo Central SRS (SRS Unit)", desc: "Ubicado bajo la consola central; pernos TORX especiales apretados a 9.8 N·m (7.2 lbf·ft) a masa G505." },
+      { grupo: "ODS_SENS", sec: "24-177", pag: 2310, titulo: "Sensores de Impacto Lateral Primarios (Pilar B)", desc: "Pernos TORX a 9.8 N·m en la base del poste central. Sustitución obligatoria tras impacto lateral." },
+      { grupo: "ODS_SENS", sec: "24-178", pag: 2311, titulo: "Sensores de Impacto Lateral Secundarios (Pilar C)", desc: "Pernos TORX a 9.8 N·m junto a las salpicaderas traseras detrás del guarnecido lateral." },
+      { grupo: "ODS_SENS", sec: "24-179", pag: 2312, titulo: "Reemplazo de Sensores de Peso del Copiloto (SWS)", desc: "4 celdas en la base del asiento; tuercas TORX apretadas en cruz a 42 N·m (30 lbf·ft)." },
+      { grupo: "ODS_SENS", sec: "24-181", pag: 2314, titulo: "Reemplazo del Módulo ODS en Asiento Copiloto", desc: "Desmontaje de vestidura de respaldo; fijación del módulo ODS y calibración de peso con HDS." },
+      { grupo: "ODS_SENS", sec: "24-182", pag: 2315, titulo: "Reemplazo de Sensores de Impacto Frontales", desc: "Ubicados tras la fascia delantera en el travesaño; pernos TORX a 9.8 N·m (7.2 lbf·ft)." }
+    ];
+
+    let itemsFiltrados = [...sistemasRetencion];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas oficiales`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...sistemasRetencion];
+      } else {
+        itemsFiltrados = sistemasRetencion.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...sistemasRetencion];
+      } else {
+        itemsFiltrados = sistemasRetencion.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Carga directa de la lámina de precauciones y regla de los 3 minutos (Pág. 2148 / Sec. 24-15)
+      const initIdx = sistemasRetencion.findIndex(i => i.pag === 2148);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

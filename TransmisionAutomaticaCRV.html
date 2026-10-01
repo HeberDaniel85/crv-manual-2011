@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Transmisión Automática MZJA / MZHA</title>
+  <style>
+    :root {
+      --bg-dark: #060913;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --atf-violet: #8b5cf6;
+      --atf-glow: rgba(139, 92, 246, 0.35);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--atf-violet);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--atf-glow);
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: var(--atf-violet);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--atf-violet); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--atf-violet);
+      border-color: var(--atf-violet);
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--atf-violet);
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">A/T 5-SPD</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Transmisión Automática MZJA / MZHA (Sec. 14)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar solenoide, ATF, sensor velocidad, D3, switch...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">⚙️ Toda la Transmisión Automática</option>
+        <option value="GENERAL">🛢️ Mantenimiento, ATF y Presiones</option>
+        <option value="POWERFLOW">🔄 Flujo de Potencia y Embragues 1-5</option>
+        <option value="SOLENOIDS">⚡ Solenoides (Shift A-E / Lineal A-C)</option>
+        <option value="SWITCH_SENS">🔌 Sensores, Conectores y Switch TR</option>
+        <option value="DTC_DIAG">🔍 Guía de Diagnóstico y Códigos DTC</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú Transmisión</button>
+        <span id="sheet-title">Página 14-28</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Oficial de Transmisión Automática Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE AUTOMATIC TRANSMISSION (SECCIÓN 14 COMPLETA)
+    const transmisionAutomatica = [
+      { grupo: "GENERAL", sec: "14-1", pag: 666, titulo: "Índice General de Transmisión Automática", desc: "Tabla de contenido maestro: Herramientas, resolución de síntomas, solenoides y despiece." },
+      { grupo: "GENERAL", sec: "14-3", pag: 669, titulo: "Herramientas Especiales: Transmisión", desc: "Extractores de retenes, mandriles de cojinetes de 32 a 75 mm y martillo deslizante." },
+      { grupo: "DTC_DIAG", sec: "14-4", pag: 670, titulo: "Diagnóstico con HDS y Parpadeo de Luz D", desc: "Lectura de códigos de falla por parpadeo de indicador D y almacenamiento en PCM." },
+      { grupo: "DTC_DIAG", sec: "14-13", pag: 679, titulo: "Índice DTC: Sensores de Presión y Solenoides", desc: "P0843 (Sensor 2da), P0847/P0848 (Sensor 3ra), P0962/P0963 (Solenoide lineal A)." },
+      { grupo: "DTC_DIAG", sec: "14-14", pag: 680, titulo: "Índice DTC: Solenoides de Cambio A, B, C", desc: "P0966/P0967 (Lineal B), P0970/P0971 (Lineal C), P0973/P0974 (Shift A), P0976/P0977 (Shift B)." },
+      { grupo: "DTC_DIAG", sec: "14-21", pag: 687, titulo: "Síntomas: Golpeteo o Retardo al Cambiar a D / R", desc: "Diagnóstico de solenoides A/B/C/E, chicote desajustado o baja presión de 1er embrague." },
+      { grupo: "SOLENOIDS", sec: "14-28", pag: 694, titulo: "Ubicación Externa de Solenoides y Sensores", desc: "Solenoides lineales A, B, C, sensores de presión 2da/3ra, switch TR y sensor de temperatura ATF." },
+      { grupo: "POWERFLOW", sec: "14-29", pag: 695, titulo: "Descripción General del Sistema de 3 Ejes", desc: "Convertidor de 3 elementos, ejes principal (Main), secundario y contraeje (Countershaft)." },
+      { grupo: "POWERFLOW", sec: "14-30", pag: 696, titulo: "Mecanismo de Transferencia 4WD y Palanca", desc: "Funcionamiento del cardán en 4WD y posiciones P, R, N, D, D3, 2 y 1." },
+      { grupo: "POWERFLOW", sec: "14-31", pag: 697, titulo: "Diagrama Interno de Embragues y Tren de Engranajes", desc: "Discos de fricción, platos de acero, tambores de embrague 1 a 5 y engranaje de reversa." },
+      { grupo: "POWERFLOW", sec: "14-34", pag: 700, titulo: "Flujo de Potencia: 1ra Velocidad", desc: "Presión aplicada al 1er embrague en eje secundario, movimiento al contraeje." },
+      { grupo: "POWERFLOW", sec: "14-35", pag: 701, titulo: "Flujo de Potencia: 2da Velocidad", desc: "Presión aplicada al 2do embrague en el extremo del eje secundario." },
+      { grupo: "POWERFLOW", sec: "14-36", pag: 702, titulo: "Flujo de Potencia: 3ra Velocidad", desc: "Presión aplicada al 3er embrague en posición central espalda con espalda con 1ra." },
+      { grupo: "POWERFLOW", sec: "14-37", pag: 703, titulo: "Flujo de Potencia: 4ta Velocidad", desc: "Presión aplicada al 4to embrague en eje principal acoplado al selector de reversa." },
+      { grupo: "POWERFLOW", sec: "14-38", pag: 704, titulo: "Flujo de Potencia: 5ta Velocidad", desc: "Presión hidráulica aplicada al 5to embrague en el eje principal hacia la corona final." },
+      { grupo: "POWERFLOW", sec: "14-39", pag: 705, titulo: "Flujo de Potencia: Reversa (R Position)", desc: "Servo acciona selector de reversa en contraeje; reversa gira por engrane loco (Idler)." },
+      { grupo: "SOLENOIDS", sec: "14-40", pag: 706, titulo: "Diagrama Funcional de Control Electrónico", desc: "Comandos de PCM hacia solenoides de cambio A-E y de presión lineal A-C." },
+      { grupo: "SOLENOIDS", sec: "14-41", pag: 707, titulo: "Tabla de Combinación Lógica de Solenoides A-E", desc: "Estado ON/OFF de cada solenoide para cada marcha (1ra a 5ta, P, R, N, 2, 1)." },
+      { grupo: "POWERFLOW", sec: "14-42", pag: 708, titulo: "Lógica de Pendientes (Grade Logic Control)", desc: "Control de ascenso y descenso en pendientes para evitar cambios repetitivos." },
+      { grupo: "POWERFLOW", sec: "14-44", pag: 710, titulo: "Modo D3 (Overdrive Off) en Palanca de Cambios", desc: "Bloqueo de cambios hasta 3ra velocidad al presionar botón D3 en la perilla." },
+      { grupo: "SOLENOIDS", sec: "14-45", pag: 711, titulo: "Control Lineal de Presión de Embragues A, B, C", desc: "Regulación modulada de presión para acople suave sin patinamiento ni tirones." },
+      { grupo: "POWERFLOW", sec: "14-46", pag: 712, titulo: "Control de Bloqueo de Convertidor (Lock-Up)", desc: "Solenoide Shift E y solenoide lineal A gobernando válvula de bloqueo en 2da a 5ta." },
+      { grupo: "SWITCH_SENS", sec: "14-47", pag: 713, titulo: "Conexiones Eléctricas de Transmisión a PCM", desc: "Cableado de solenoide de bloqueo de palanca (Shift Lock), switch de freno e inmovilizador." },
+      { grupo: "SWITCH_SENS", sec: "14-48", pag: 714, titulo: "Pinout PCM Conector B: Sensores de Presión", desc: "B8 (Presión 2da), B9 (Presión 3ra), B10 (Shift A), B11 (Shift B), B12 (Neutro)." },
+      { grupo: "SWITCH_SENS", sec: "14-49", pag: 715, titulo: "Pinout PCM Conector B: Sensores y Solenoides", desc: "B17 (Velocidad entrada NM), B25 (Lineal C), B26 (Shift D), B27 (Temp. ATF)." },
+      { grupo: "SOLENOIDS", sec: "14-51", pag: 717, titulo: "Cuerpo de Válvulas y Distribución de Solenoides", desc: "Servo Body (Shift A-E), Main Valve Body y Regulator Body." },
+      { grupo: "POWERFLOW", sec: "14-73", pag: 739, titulo: "Circuito Hidráulico del Bloqueo (Sin Lock-Up)", desc: "Circulación de fluido en convertidor de torque cuando el embrague de bloqueo está libre." },
+      { grupo: "POWERFLOW", sec: "14-75", pag: 741, titulo: "Circuito Hidráulico del Bloqueo Total (Full Lock-Up)", desc: "Fluido drenado detrás del pistón; convertidor acoplado 1:1 rígidamente al cigüeñal." },
+      { grupo: "SWITCH_SENS", sec: "14-87", pag: 753, titulo: "Diagnóstico DTC P0705 / P0706: Switch de Rango (TR)", desc: "Prueba de terminales del sensor de posición de cambios en caja y conector B de PCM." },
+      { grupo: "DTC_DIAG", sec: "14-125", pag: 791, titulo: "Diagnóstico DTC P0747: Solenoide Lineal A Atorado ON", desc: "Prueba de presión y reemplazo del solenoide lineal A de embrague." },
+      { grupo: "DTC_DIAG", sec: "14-141", pag: 807, titulo: "Diagnóstico DTC P0847 / P0848: Sensor Presión 3ra", desc: "Prueba de voltaje en B9 (BLU/WHT): 5.0 V desconectado, 0 V con presión." },
+      { grupo: "DTC_DIAG", sec: "14-146", pag: 812, titulo: "Diagnóstico DTC P0962: Solenoide Lineal A en Corto", desc: "Comprobación de resistencia del solenoide (3.8 a 6.8 ohms) y arnés." },
+      { grupo: "DTC_DIAG", sec: "14-161", pag: 827, titulo: "Diagnóstico DTC P0973 / P0974: Solenoide Shift A", desc: "Prueba de sonido de clic con HDS y resistencia de bobina interna." },
+      { grupo: "GENERAL", sec: "14-211", pag: 877, titulo: "Prueba Dinámica de Ruta (Road Test)", desc: "Velocidades de cambio en D a 1.75V de acelerador: 1-2 (19-24 km/h), 2-3 (32-39 km/h), 3-4 (45-53 km/h)." },
+      { grupo: "GENERAL", sec: "14-213", pag: 879, titulo: "Prueba de Calado de Convertidor (Stall Speed)", desc: "Régimen normal: 2,445 rpm (rango 2,295-2,595 rpm). RPM altas = patinamiento de embrague." },
+      { grupo: "GENERAL", sec: "14-218", pag: 884, titulo: "Prueba de Resistencia de Solenoides de Cambio", desc: "Resistencia estándar en frío de solenoides Shift A, B, C, D, E: 12 a 25 ohms." },
+      { grupo: "GENERAL", sec: "14-222", pag: 888, titulo: "Reemplazo de Solenoides de Cambio A-E y Arnés", desc: "Retiro de cubierta de servo body, pernos 6x1.0mm a 12 N·m con O-rings nuevos." },
+      { grupo: "GENERAL", sec: "14-227", pag: 893, titulo: "Reemplazo de Solenoide Lineal A (Exterior)", desc: "Pernos de fijación 6x1.0mm: 12 N·m (8.7 lbf·ft) y filtro/junta nueva." },
+      { grupo: "GENERAL", sec: "14-232", pag: 898, titulo: "Reemplazo de Solenoides Lineales B y C", desc: "Ubicados en la carcasa frontal. Pernos a 12 N·m; verificar microfiltros de tubos." },
+      { grupo: "SWITCH_SENS", sec: "14-234", pag: 900, titulo: "Reemplazo de Sensores de Presión de 2da y 3ra", desc: "Perno 10mm rosca directa: 20 N·m (14 lbf·ft) con arandela de aluminio nueva." },
+      { grupo: "GENERAL", sec: "14-238", pag: 904, titulo: "Comprobación del Nivel de Fluido ATF", desc: "Motor a temperatura, apagar y medir en varilla entre 60 y 90 segundos exactos." },
+      { grupo: "GENERAL", sec: "14-239", pag: 905, titulo: "Cambio de Fluido ATF y Capacidades", desc: "Tapón 18mm: 49 N·m. Capacidad: 2.6 L (2WD), 2.5 L (4WD). Usar solo Honda ATF-Z1." },
+      { grupo: "GENERAL", sec: "14-246", pag: 912, titulo: "Desmontaje de Transmisión del Vehículo (Paso 1)", desc: "Herramientas de sujeción VSB02C000032, subchasis, flechas y soporte de transmisión." },
+      { grupo: "SWITCH_SENS", sec: "14-292", pag: 958, titulo: "Prueba del Switch de Rango (Transmission Range)", desc: "Continuidad entre pines 1 al 10 en cada posición de palanca (P, R, N, D, 2, 1)." },
+      { grupo: "SWITCH_SENS", sec: "14-294", pag: 960, titulo: "Alineación y Ajuste del Switch de Rango", desc: "Alineación con pasador de 2.0 mm en posición Neutro (N). Pernos a 12 N·m." }
+    ];
+
+    let itemsFiltrados = [...transmisionAutomatica];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas técnicas`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...transmisionAutomatica];
+      } else {
+        itemsFiltrados = transmisionAutomatica.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...transmisionAutomatica];
+      } else {
+        itemsFiltrados = transmisionAutomatica.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Carga directa de la lámina de solenoides y sensores externos (Pág. 694 / Sec. 14-28)
+      const initIdx = transmisionAutomatica.findIndex(i => i.pag === 694);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

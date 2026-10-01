@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Audio, Navegación y Telemática (Sec. 23)</title>
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --audio-purple: #a855f7;
+      --audio-glow: rgba(168, 85, 247, 0.35);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --honda-red: #ef4444;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--audio-purple);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--audio-glow);
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: var(--audio-purple);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--audio-purple); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--audio-purple);
+      border-color: var(--audio-purple);
+      color: #fff;
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--audio-purple);
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">AUDIO/NAV</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Audio, Navegación y Telemática (Sec. 23)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar pinout, GPS, GA-Net, código, mandos, cámara...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">📻 Todo Audio, Navegación y GPS</option>
+        <option value="AUDIO_SYS">🔊 Sistema de Audio, Bocinas y AUX</option>
+        <option value="PINOUTS">🔌 Pinouts Conectores A, B, C, D, E, G, K</option>
+        <option value="REMOTE_SW">🔘 Mandos al Volante y Comandos de Voz</option>
+        <option value="NAVI_GPS">🛰️ Navegación, Antena GPS y Satélites</option>
+        <option value="DIAG_MODE">🛠️ Menú Oculto (MENU+MAP+CANCEL)</option>
+        <option value="CAMERA_REAR">📷 Cámara de Reversa y Conexiones</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú Audio/Nav</button>
+        <span id="sheet-title">Página 23-6</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Oficial de Audio y Navegación Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE AUDIO, NAVEGACIÓN Y TELEMÁTICA (SECCIÓN 23)
+    const audioNavegacion = [
+      { grupo: "AUDIO_SYS", sec: "23-1", pag: 1990, titulo: "Índice de la Sección de Audio y Navegación", desc: "Tabla maestra: Herramientas, localización de componentes, GA-Net bus, diagramas, bocinas y GPS." },
+      { grupo: "AUDIO_SYS", sec: "23-2", pag: 1991, titulo: "Herramientas Especiales: CDs de Calibración", desc: "CDs de prueba acústica 07AAZ-SDBA100, prueba de salto de pista y evaluación de balance/fase." },
+      { grupo: "AUDIO_SYS", sec: "23-3", pag: 1992, titulo: "Ubicación de Componentes del Sistema de Audio", desc: "Bocinas de puertas, tweeters, unidad principal, antena AM/FM/XM, receptor XM y cambiador de CDs." },
+      { grupo: "AUDIO_SYS", sec: "23-4", pag: 1993, titulo: "Diagnóstico de Síntomas: Recepción y Sonido", desc: "Recepción deficiente, estéreo no enciende o no apaga, distorsión, memoria borrada y volumen SVC." },
+      { grupo: "AUDIO_SYS", sec: "23-5", pag: 1994, titulo: "Síntomas: Cambiador de CDs y Mensajes XM", desc: "Error de carga/expulsión de disco, mensajes 'XM NO SIGNAL' o 'XM ANTENNA' en pantalla." },
+      { grupo: "AUDIO_SYS", sec: "23-6", pag: 1995, titulo: "Descripción del Sistema y Ajuste de Volumen SVC", desc: "Ajuste de compensación de velocidad (OFF, LOW, MID, HIGH) alimentado por pulsos VSP de la PCM." },
+      { grupo: "AUDIO_SYS", sec: "23-7", pag: 1996, titulo: "Topología en Cadena del Bus GA-Net II", desc: "Lazo serie entre estéreo, navegación y XM. Mute en bocinas delanteras durante guía por voz." },
+      { grupo: "AUDIO_SYS", sec: "23-8", pag: 1997, titulo: "Diagrama de Bloques General del Sistema", desc: "Interconexión entre procesador de audio, amplificador estéreo, sintonizadores y pantalla central." },
+      { grupo: "PINOUTS", sec: "23-11", pag: 2001, titulo: "Conectores de la Unidad de Audio con Navegación", desc: "Disposición física de conectores: Conector A (17P), B (22P), E (14P), G (3P) y K (7P)." },
+      { grupo: "PINOUTS", sec: "23-12", pag: 2002, titulo: "Conectores de Audio sin Navegación (Estéreo Estándar)", desc: "Disposición de conectores A (17P), B (20P), E (14P para XM) y tipo 1DIN." },
+      { grupo: "PINOUTS", sec: "23-13", pag: 2003, titulo: "Pinout Conector A (17P): Alimentación y Bocinas", desc: "A1 (ILL+), A9 (GND G504), A13 (VSP pulsos de PCM), A14 (+12V ACC fusible 34) y A17 (+B constante fusible 23)." },
+      { grupo: "PINOUTS", sec: "23-14", pag: 2004, titulo: "Pinout Conector B: Puerto Auxiliar y Mandos Remotos", desc: "B1 a B3 (Líneas AUX), B6 (Tierra de mandos de volante) y B7 (Señal analógica de mandos de volante)." },
+      { grupo: "PINOUTS", sec: "23-15", pag: 2005, titulo: "Pinout Conector C (12P): Respaldos y Luces", desc: "C1 (+B Back Up), C4 (GND G502), C7 (Línea de reversa desde MICU para activación de cámara)." },
+      { grupo: "PINOUTS", sec: "23-16", pag: 2006, titulo: "Pinout Conector E (14P GA-Net) y Conector G (3P Antena)", desc: "Líneas de datos BUS+ y BUS- de GA-Net (E9/E10), alimentación de antena activa AM/FM (G3)." },
+      { grupo: "AUDIO_SYS", sec: "23-22", pag: 2011, titulo: "Diagrama Eléctrico de Audio con Navegación", desc: "Líneas hacia amplificador de potencia, fusibles 23 (10A) y 34 (7.5A), sensor VSP y tierras G502/G504." },
+      { grupo: "AUDIO_SYS", sec: "23-23", pag: 2012, titulo: "Diagrama Eléctrico de Salidas hacia Bocinas", desc: "Cableado de bocinas de puertas delanteras/traseras, tweeters en tablero y conector del Jack AUX." },
+      { grupo: "REMOTE_SW", sec: "23-55", pag: 2044, titulo: "Tabla de Resistencias de Mandos al Volante", desc: "Medición en B6 y B7: Reposo (10 kΩ), VOL UP (357 Ω), VOL DOWN (100 Ω), CH+ (1.7 kΩ), CH- (775 Ω), MODE (3.7 kΩ)." },
+      { grupo: "AUDIO_SYS", sec: "23-63", pag: 2051, titulo: "Especificaciones de Tarjeta PC Card (PCMCIA)", desc: "Ranura frontal tras pantalla abatible: formato exclusivo FAT/FAT32, hasta 2 GB, archivos MP3 y WMA." },
+      { grupo: "AUDIO_SYS", sec: "23-71", pag: 2059, titulo: "Diagnóstico de Calidad de Audio y Fase Acústica", desc: "Prueba de polaridad de bocinas con CD de prueba 07AAZ-SDBA100 para descartar cables invertidos." },
+      { grupo: "AUDIO_SYS", sec: "23-77", pag: 2064, titulo: "Prueba de Sintonizador AM/FM (Seek Stop Test)", desc: "Medición de intensidad de campo de radio en área abierta para descartar amplificador de antena roto." },
+      { grupo: "NAVI_GPS", sec: "23-84", pag: 2075, titulo: "Ubicación de Componentes de Navegación y GPS", desc: "Pantalla táctil LCD 6.5\", antena GPS bajo tablero central, micrófono de techo y botones TALK/BACK." },
+      { grupo: "NAVI_GPS", sec: "23-85", pag: 2076, titulo: "Código Antirrobo y Tiempo de Adquisición GPS", desc: "Desconexión de batería resetea reloj a 0:00. Requiere código PIN y 10 a 45 min a cielo abierto para satélites." },
+      { grupo: "NAVI_GPS", sec: "23-90", pag: 2079, titulo: "Descripción de Navegación Híbrida y Giroscopio", desc: "Localización combinada: satélites GPS + giroscopio interno de guiñada (Yaw Rate) + pulsos VSP de PCM." },
+      { grupo: "NAVI_GPS", sec: "23-94", pag: 2084, titulo: "Estados del Icono GPS en la Pantalla", desc: "Sin icono (<=2 satélites, sin fijación), Cuadro Blanco (3 satélites, 2D plano), Cubo Verde (>=4 satélites, 3D altitud)." },
+      { grupo: "NAVI_GPS", sec: "23-96", pag: 2086, titulo: "Características de la Pantalla LCD de 6.5 Pulgadas", desc: "Panel TFT de 65,536 colores con membrana táctil resistiva insensible a la luz solar directa." },
+      { grupo: "DIAG_MODE", sec: "23-122", pag: 2089, titulo: "Entrada al Menú de Diagnóstico Oculto (Secreto)", desc: "Llave en ON (II), mantener oprimidos MENU + MAP/GUIDE + CANCEL por 5 segundos en la pantalla." },
+      { grupo: "PINOUTS", sec: "23-127", pag: 2090, titulo: "Pantalla 'Car Status' (Monitoreo en Tiempo Real)", desc: "Valores lógicos: VSP (1=movimiento), BACK (1=palanca en reversa para cámara), ILL (brillo de tablero)." },
+      { grupo: "REMOTE_SW", sec: "23-132", pag: 2092, titulo: "Prueba de Micrófono de Techo y Botones de Voz", desc: "Pantalla 'Mic Level': decir 'Testing' con TALK oprimido; la barra debe subir y cambiar a verde." },
+      { grupo: "REMOTE_SW", sec: "23-141", pag: 2130, titulo: "Prueba del Interruptor de Voz (TALK / BACK)", desc: "Conector de 3 pines: Reposo (10 kΩ), botón TALK (2.9 kΩ / 4-5V), botón BACK (700 Ω / 2.5-3V)." },
+      { grupo: "CAMERA_REAR", sec: "23-142", pag: 2131, titulo: "Cámara de Reversa: Desmontaje y Conexiones", desc: "Retiro de guarnecido inferior de compuerta trasera, conector 6P con alimentación de 8V y señal de video." },
+      { grupo: "NAVI_GPS", sec: "23-143", pag: 2132, titulo: "Desmontaje de la Antena GPS en Tablero", desc: "Retiro de tapa central superior del tablero; conector coaxial especial de 2 pines tipo H (5V de antena)." },
+      { grupo: "NAVI_GPS", sec: "23-140", pag: 2129, titulo: "Extracción de la Unidad Central de Navegación", desc: "Retiro de rejillas centrales de ventilación, controles de clima, 4 pernos de fijación y seguro anti-rayones." }
+    ];
+
+    let itemsFiltrados = [...audioNavegacion];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas técnicas`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...audioNavegacion];
+      } else {
+        itemsFiltrados = audioNavegacion.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...audioNavegacion];
+      } else {
+        itemsFiltrados = audioNavegacion.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Carga directa de la lámina de descripción del sistema y GA-Net (Pág. 1995 / Sec. 23-6)
+      const initIdx = audioNavegacion.findIndex(i => i.pag === 1995);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

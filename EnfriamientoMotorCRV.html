@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Enfriamiento del Motor K24Z1</title>
+  <style>
+    :root {
+      --bg-dark: #070b12;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --honda-blue: #0284c7;
+      --honda-blue-glow: rgba(2, 132, 199, 0.35);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--honda-blue);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--honda-blue-glow);
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(2, 132, 199, 0.2);
+      border-color: var(--honda-blue);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--honda-blue); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--honda-blue);
+      border-color: var(--honda-blue);
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--honda-blue);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">COOLING</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Sistema de Enfriamiento (Engine Cooling - Sec. 10)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar bomba, termostato, purga, ventilador, ECT...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">❄️ Todo el Sistema de Enfriamiento</option>
+        <option value="PUMP_THERMO">🔄 Bomba de Agua y Termostato</option>
+        <option value="RAD_SERVICE">🛢️ Radiador, Purga y Capacidades</option>
+        <option value="FAN_CTRL">⚡ Motoventiladores y Relés (Fan Controls)</option>
+        <option value="PASSAGES">🔩 Conductos de Agua y EGR (Water Passage)</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú Enfriamiento</button>
+        <span id="sheet-title">Página 10-5</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Oficial de Enfriamiento Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE ENGINE COOLING (SECCIÓN 10 COMPLETA: PÁG 235 A 263)
+    const enfriamientoMotor = [
+      { grupo: "RAD_SERVICE", sec: "10-1", pag: 235, titulo: "Índice de la Sección de Enfriamiento", desc: "Tabla de contenido de componentes, pruebas de presión, termostato y controles." },
+      { grupo: "RAD_SERVICE", sec: "10-2", pag: 236, titulo: "Ubicación de Componentes de Enfriamiento", desc: "Radiador, bomba de agua, termostato, sensor ECT 2, tolvas y ventiladores." },
+      { grupo: "RAD_SERVICE", sec: "10-3", pag: 237, titulo: "Prueba del Tapón y Radiador (Pressure Test)", desc: "Presión de apertura: 93 a 123 kPa (14 a 18 psi). Verificación de caída de presión." },
+      { grupo: "FAN_CTRL", sec: "10-4", pag: 238, titulo: "Prueba de Motores de Ventilador y Termostato", desc: "Prueba banco motor 2P. Termostato: abre a 76-80°C, apertura total a 90°C (carrera mín 8.0 mm)." },
+      { grupo: "PUMP_THERMO", sec: "10-5", pag: 239, titulo: "Inspección y Reemplazo de la Bomba de Agua", desc: "6 pernos 6x1.0mm: 12 N·m (8.7 lbf·ft). O-ring de sellado nuevo obligatorio." },
+      { grupo: "RAD_SERVICE", sec: "10-6", pag: 240, titulo: "Comprobación y Vaciado de Refrigerante", desc: "Drenaje por grifo inferior, vaciado del reservorio (0.6 L). Nivel entre MIN y MAX." },
+      { grupo: "RAD_SERVICE", sec: "10-7", pag: 241, titulo: "Llenado y Protocolo Oficial de Purga Térmica", desc: "Honda Type 2 al 50/50. Tapón flojo hasta que los ventiladores ciclen 2 veces. Capacidad: 5.0 L." },
+      { grupo: "PUMP_THERMO", sec: "10-8", pag: 242, titulo: "Reemplazo del Termostato (Manguera Inferior)", desc: "Pernos de cubierta 6x1.0mm: 9.8 N·m (7.2 lbf·ft). Válvula jiggle valve hacia ARRIBA." },
+      { grupo: "PASSAGES", sec: "10-9", pag: 243, titulo: "Desmontaje del Pasaje de Agua (Water Passage)", desc: "Desconexión de alternador, mangueras de bypass, tubo conector y cárter de termostato." },
+      { grupo: "PASSAGES", sec: "10-10", pag: 244, titulo: "Instalación del Pasaje de Agua y Silicón Líquido", desc: "Hondabond en bloque, O-rings nuevos. Pernos 10x1.25mm: 44 N·m, tubo conector 8mm: 22 N·m." },
+      { grupo: "PASSAGES", sec: "10-12", pag: 246, titulo: "Desmontaje del Conducto de Agua EGR (Paso 1-7)", desc: "Retiro de base de filtro de aire, mangueras de radiador y desconexión de válvula EGR." },
+      { grupo: "PASSAGES", sec: "10-13", pag: 247, titulo: "Instalación del Conducto de Agua EGR", desc: "Pernos 8x1.25mm: 22 N·m (16 lbf·ft) con junta metálica nueva." },
+      { grupo: "FAN_CTRL", sec: "10-15", pag: 249, titulo: "Desmontaje de Tolvas y Motoventiladores", desc: "Retiro de travesaño frontal (bulkhead), conectores 2P de motores y clips de arnés." },
+      { grupo: "FAN_CTRL", sec: "10-16", pag: 250, titulo: "Despiece y Armado de Tolvas de Ventilador", desc: "Torques de tornillos de motor: 6.0 N·m (4.4 lbf·ft) y aspas a 2.6 N·m (2.0 lbf·ft)." },
+      { grupo: "FAN_CTRL", sec: "10-17", pag: 251, titulo: "Montaje de Travesaño Frontal y Tolvas", desc: "Pernos de travesaño superior 6x1.0mm: 9.8 N·m (7.2 lbf·ft) y aplicación de pintura anticorrosiva." },
+      { grupo: "RAD_SERVICE", sec: "10-18", pag: 252, titulo: "Desmontaje de Radiador (Modelo Japón)", desc: "Drenado, desconexión de sensor ECT 2 en tanque inferior y líneas de enfriador de ATF." },
+      { grupo: "RAD_SERVICE", sec: "10-19", pag: 253, titulo: "Extracción e Inspección del Radiador (Japón)", desc: "Separación de tolvas A/C y radiador, inspección de cojinetes inferiores de goma." },
+      { grupo: "RAD_SERVICE", sec: "10-21", pag: 255, titulo: "Desmontaje de Radiador (Modelo USA)", desc: "Desconexión superior, travesaño frontal y acople rápido de manguera inferior." },
+      { grupo: "RAD_SERVICE", sec: "10-22", pag: 256, titulo: "Conector Rápido (Quick-Connect) Inferior", desc: "Retiro manual del seguro sin herramientas para no quebrar la boca plástica." },
+      { grupo: "RAD_SERVICE", sec: "10-24", pag: 258, titulo: "Instalación del Conector Rápido y O-ring", desc: "O-ring nuevo lubricado con refrigerante fresco hasta escuchar el clic de bloqueo." },
+      { grupo: "FAN_CTRL", sec: "10-26", pag: 260, titulo: "Ubicación de Controles de Ventiladores", desc: "Relé de ventilador de radiador, relé A/C condenser, Fan Control Relay y ECT 1/2." },
+      { grupo: "FAN_CTRL", sec: "10-27", pag: 261, titulo: "Diagnóstico de Síntomas: Sobrecalentamiento", desc: "Procedimiento de prueba lógica si no entran en alta velocidad a más de 93°C (199°F)." },
+      { grupo: "FAN_CTRL", sec: "10-28", pag: 262, titulo: "Diagrama Eléctrico de Ventiladores", desc: "Circuitos comandados por PCM (terminales A4, A5, A21), fusibles 11, 6, 7 y masa G301." },
+      { grupo: "FAN_CTRL", sec: "10-29", pag: 263, titulo: "Diagnóstico de Alta Velocidad de Ventiladores", desc: "Prueba de terminales 2 y 5 del socket 5P del Fan Control Relay en la fusilera de motor." }
+    ];
+
+    let itemsFiltrados = [...enfriamientoMotor];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas técnicas`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...enfriamientoMotor];
+      } else {
+        itemsFiltrados = enfriamientoMotor.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...enfriamientoMotor];
+      } else {
+        itemsFiltrados = enfriamientoMotor.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Abre por defecto en la lámina de la Bomba de Agua (Pág. 239 / Sec. 10-5)
+      const initIdx = enfriamientoMotor.findIndex(i => i.pag === 239);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

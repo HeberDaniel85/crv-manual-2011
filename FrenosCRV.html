@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Frenos y VSA (Sección 19)</title>
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --brake-red: #ef4444;
+      --brake-glow: rgba(239, 68, 68, 0.35);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--brake-red);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--brake-glow);
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--brake-red);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--brake-red); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--brake-red);
+      border-color: var(--brake-red);
+      color: #fff;
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--brake-red);
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">BRAKES</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Frenos Convencionales y VSA (Sec. 19)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar caliper, purga, pastillas, booster, VSA, torque...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">🛑 Todo el Sistema de Frenos y VSA</option>
+        <option value="FRONT">🚗 Frenos Delanteros (Caliper y Discos)</option>
+        <option value="REAR">🚙 Frenos Traseros (Caliper y Discos)</option>
+        <option value="PARKING">🅿️ Freno de Estacionamiento (Tambor/Zapatas)</option>
+        <option value="HYDRAULIC">🛢️ Bomba, Servofreno (Booster) y Purga</option>
+        <option value="VSA_SYS">⚡ Sistema VSA (Modulador, Sensores y DTC)</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú Frenos</button>
+        <span id="sheet-title">Página 19-9</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Oficial de Frenos Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE FRENOS Y VSA (SECCIÓN 19 COMPLETA)
+    const frenosVSA = [
+      { grupo: "HYDRAULIC", sec: "19-1", pag: 1302, titulo: "Índice General de Frenos y VSA", desc: "Tabla de contenido maestro: Frenos convencionales, sangrado, cilindro maestro, booster y VSA." },
+      { grupo: "HYDRAULIC", sec: "19-2", pag: 1303, titulo: "Herramientas Especiales de Frenado", desc: "Compresor de pistón de caliper 07AAE-SEPA101 y adaptadores de purga." },
+      { grupo: "HYDRAULIC", sec: "19-3", pag: 1304, titulo: "Ubicación de Componentes Convencionales", desc: "Cilindro maestro, servofreno, calipers delanteros/traseros, tambor de estacionamiento y pedal." },
+      { grupo: "HYDRAULIC", sec: "19-4", pag: 1305, titulo: "Inspección de Fugas y Prueba de Pedal Hundido", desc: "Prueba con cinta métrica en volante: incremento de carrera no mayor a 10 mm en 3 minutos." },
+      { grupo: "HYDRAULIC", sec: "19-5", pag: 1306, titulo: "Diagnóstico: Freno Pegado (Drag) y Caliper Pins", desc: "Intercambio de pernos guía A y B causa vibración y desgaste rápido. Prueba de arrastre en ruedas." },
+      { grupo: "HYDRAULIC", sec: "19-6", pag: 1307, titulo: "Ajuste de Altura de Pedal y Switch de Freno", desc: "Altura de pedal: 165 mm (sin alfombra). Juego libre: 1-5 mm. Switch se ajusta a 0.7 mm girando 45°." },
+      { grupo: "PARKING", sec: "19-7", pag: 1308, titulo: "Inspección del Freno de Mano (Clics de Pedal)", desc: "Traba de 5 a 6 clics aplicando 294 N (66 lbf). Si no cumple, requiere ajuste menor o mayor." },
+      { grupo: "PARKING", sec: "19-8", pag: 1309, titulo: "Ajuste Mayor en Tambor de Freno de Mano", desc: "Girar ajustador estrellado hasta trabar tambor y regresar 8 clics exactos. Tapón de acceso de goma." },
+      { grupo: "HYDRAULIC", sec: "19-9", pag: 1310, titulo: "Purga del Sistema de Frenos (Bleeding)", desc: "Secuencia en cruz: Del. Izq -> Del. Der -> Tras. Der -> Tras. Izq. Purgador a 9 N·m. Usar Honda DOT 3." },
+      { grupo: "HYDRAULIC", sec: "19-10", pag: 1311, titulo: "Diagrama Eléctrico de Testigo de Freno", desc: "Líneas hacia cuadro de instrumentos, sensor de nivel de reservorio y switch de freno de mano a masa G401." },
+      { grupo: "HYDRAULIC", sec: "19-11", pag: 1312, titulo: "Prueba de Switch de Freno de Mano y Nivel", desc: "Continuidad con flotador abajo; circuito abierto con nivel MAX. Prueba de continuidad de switch 1P." },
+      { grupo: "FRONT", sec: "19-12", pag: 1313, titulo: "Inspección y Reemplazo de Pastillas Delanteras", desc: "Espesor estándar: 11.5-12.2 mm. Límite: 1.6 mm. Extracción de perno pasante sosteniendo el perno guía." },
+      { grupo: "FRONT", sec: "19-13", pag: 1314, titulo: "Compresión de Pistón y Grasa M-77 Delantera", desc: "Útil 07AAE-SEPA101 para retraer pistón. Aplicar M-77 en retenes de lámina y lomos de pastillas." },
+      { grupo: "FRONT", sec: "19-14", pag: 1315, titulo: "Instalación de Caliper Delantero y Torques", desc: "Perno 10x1.0mm: 50 N·m (37 lbf·ft). Pastilla con testigo acústico en la parte superior interna." },
+      { grupo: "FRONT", sec: "19-15", pag: 1316, titulo: "Inspección de Alabeo y Espesor de Disco Delantero", desc: "Espesor estándar: 27.8-28.1 mm (Límite 26.0 mm). Alabeo máx: 0.04 mm. Paralelismo máx: 0.015 mm." },
+      { grupo: "FRONT", sec: "19-16", pag: 1317, titulo: "Despiece de Caliper Delantero (Overhaul)", desc: "Pernos guía A y B, sello de pistón nuevo, cubrepolvos, purga a 9 N·m y soporte a mangueta a 137 N·m." },
+      { grupo: "HYDRAULIC", sec: "19-17", pag: 1318, titulo: "Reemplazo de la Bomba Principal (Master Cylinder)", desc: "Tuercas al booster: 15 N·m (11 lbf·ft). Líneas hidráulicas: 15 N·m. Grasa Shin-Etsu en sello de varilla." },
+      { grupo: "HYDRAULIC", sec: "19-18", pag: 1319, titulo: "Inspección y Mangueras del Cilindro Maestro", desc: "Alineación de flechas en sub-reservorio con marcas de pintura de la manguera y abrazaderas hacia abajo." },
+      { grupo: "HYDRAULIC", sec: "19-19", pag: 1320, titulo: "Pruebas de Función y Fugas del Servofreno (Booster)", desc: "Prueba de retención de vacío con motor apagado y verificación de válvula check integrada en manguera." },
+      { grupo: "HYDRAULIC", sec: "19-20", pag: 1321, titulo: "Desmontaje del Servofreno de Vacío (Booster)", desc: "Desconexión de horquilla en pedal, pernos 8x1.25mm a pared de fuego apretados a 12 N·m (8.7 lbf·ft)." },
+      { grupo: "REAR", sec: "19-22", pag: 1323, titulo: "Inspección y Reemplazo de Pastillas Traseras", desc: "Espesor estándar: 8.3-9.0 mm (Límite 1.6 mm). Retiro de pernos pasantes sosteniendo perno guía plano." },
+      { grupo: "REAR", sec: "19-23", pag: 1324, titulo: "Retracción de Pistón Trasero y Limpieza", desc: "Compresión recta del pistón. Aplicación de pasta M-77 en superficies de deslizamiento del caliper bracket." },
+      { grupo: "REAR", sec: "19-24", pag: 1325, titulo: "Instalación de Caliper Trasero y Torques", desc: "Pernos de caliper 8x1.0mm: 23 N·m (17 lbf·ft). Pastilla con indicador de desgaste hacia abajo adentro." },
+      { grupo: "REAR", sec: "19-25", pag: 1326, titulo: "Inspección de Alabeo y Espesor de Disco Trasero", desc: "Espesor estándar: 8.9-9.1 mm (Límite 7.5 mm). Alabeo máx: 0.04 mm a 10 mm del borde exterior." },
+      { grupo: "REAR", sec: "19-26", pag: 1327, titulo: "Despiece de Caliper Trasero (Overhaul)", desc: "Soporte de caliper a mangueta 12x1.25mm: 108 N·m (79.6 lbf·ft). Banjo bolt 10mm: 35 N·m (26 lbf·ft)." },
+      { grupo: "PARKING", sec: "19-27", pag: 1328, titulo: "Despiece de Zapatas de Freno de Estacionamiento", desc: "Mecanismo drum-in-hat: Palanca de accionamiento, resortes de retorno, ajustador y zapatas." },
+      { grupo: "PARKING", sec: "19-28", pag: 1329, titulo: "Inspección de Zapatas y Tambor Trasero", desc: "Espesor zapata: 1.7-3.0 mm (Límite 1.0 mm). Diámetro interno tambor: 199.9-200.0 mm (Límite 201.0 mm)." },
+      { grupo: "PARKING", sec: "19-29", pag: 1330, titulo: "Desarmado de Zapatas de Freno de Mano", desc: "Liberación de resortes de retorno superior e inferior y pernos de tensión de las zapatas." },
+      { grupo: "PARKING", sec: "19-31", pag: 1332, titulo: "Armado y Lubricación con Grasa Molykote 44MA", desc: "Aplicación de grasa en extremos de apoyo de zapatas, vástago y pivote de palanca sin tocar las balatas." },
+      { grupo: "PARKING", sec: "19-32", pag: 1333, titulo: "Asentamiento Oficial de Balatas (Break-in)", desc: "Conducir 400 m a 50 km/h con pedal de mano a 4 clics de fuerza (196 N). Dejar enfriar 10 min y repetir." },
+      { grupo: "HYDRAULIC", sec: "19-34", pag: 1335, titulo: "Tabla de Torques: Mangueras y Líneas Hidráulicas", desc: "Banjo caliper: 35 N·m. Flare nut a manguera: 15 N·m. Flare nut a bomba: 22 N·m. Flare nut VSA: 15/22 N·m." },
+      { grupo: "HYDRAULIC", sec: "19-35", pag: 1336, titulo: "Reemplazo de Mangueras Delanteras de Freno", desc: "Instalación sin torcer la manguera de goma, seguro de retención nuevo y arandelas de cobre nuevas." },
+      { grupo: "PARKING", sec: "19-37", pag: 1338, titulo: "Despiece de Chicotes de Freno de Estacionamiento", desc: "Ruteo de chicotes izquierdo y derecho hacia el ecualizador y pedal de accionamiento (22 N·m)." },
+      { grupo: "VSA_SYS", sec: "19-40", pag: 1341, titulo: "Ubicación de Componentes del Sistema VSA", desc: "Modulador VSA, sensor de ángulo de volante, sensor de aceleración/guiñada (Yaw Rate) y sensores ABS." },
+      { grupo: "VSA_SYS", sec: "19-41", pag: 1342, titulo: "Testigos de Falla: ABS, VSA, Exclamación y EBD", desc: "Lógica de encendido de indicadores en tablero y condiciones de apagado automático o por recorrido." },
+      { grupo: "VSA_SYS", sec: "19-50", pag: 1351, titulo: "Operación Hidráulica ABS y Modos de Presión", desc: "Tres modos: Intensificación de presión, retención de presión y reducción de presión por solenoide." },
+      { grupo: "VSA_SYS", sec: "19-51", pag: 1352, titulo: "Distribución Electrónica de Frenado (EBD)", desc: "Regulación de fuerza de frenado en ruedas traseras según la carga del vehículo antes de activar ABS." },
+      { grupo: "VSA_SYS", sec: "19-53", pag: 1354, titulo: "Control de Sobreviro y Subviro por VSA", desc: "Frenado selectivo de ruedas exteriores e interiores y modulación de torque en PCM para estabilizar el giro." },
+      { grupo: "VSA_SYS", sec: "19-55", pag: 1356, titulo: "Esquema Hidráulico Interno del Modulador VSA", desc: "Válvulas normalmente abiertas (NO), normalmente cerradas (NC), bomba eléctrica y cámara de amortiguación." },
+      { grupo: "VSA_SYS", sec: "19-56", pag: 1357, titulo: "Diagrama Eléctrico del Módulo VSA (Alimentación)", desc: "Fusibles No. 1 (100A), No. 3 (40A motor bomba), No. 3 (20A solenoides), switch VSA OFF y masa G502." },
+      { grupo: "VSA_SYS", sec: "19-57", pag: 1358, titulo: "Diagrama Eléctrico: Sensores de Rueda y CAN-Bus", desc: "Conexiones de sensores de velocidad FL, FR, RL, RR, sensor Yaw Rate y comunicación F-CAN a PCM." },
+      { grupo: "VSA_SYS", sec: "19-97", pag: 1398, titulo: "Desmontaje del Modulador VSA y Torques de Líneas", desc: "Conector 46P con palanca de bloqueo. Tuercas de líneas flare nut 10mm (15 N·m) y 12mm (22 N·m)." },
+      { grupo: "VSA_SYS", sec: "19-98", pag: 1399, titulo: "Instalación del Modulador VSA y Purga de Aire", desc: "Gomas aislantes nuevas para evitar vibración; purga completa del sistema con HDS si queda esponjoso." },
+      { grupo: "VSA_SYS", sec: "19-99", pag: 1400, titulo: "Reemplazo de Sensores de Velocidad de Rueda (ABS)", desc: "Perno 6x1.0mm a mangueta: 9.8 N·m (7.2 lbf·ft). Cuidado con el entrehierro y no tocar la pista magnética." }
+    ];
+
+    let itemsFiltrados = [...frenosVSA];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas técnicas`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...frenosVSA];
+      } else {
+        itemsFiltrados = frenosVSA.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...frenosVSA];
+      } else {
+        itemsFiltrados = frenosVSA.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Carga directa del procedimiento oficial de purga (Pág. 1310 / Sec. 19-9)
+      const initIdx = frenosVSA.findIndex(i => i.pag === 1310);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

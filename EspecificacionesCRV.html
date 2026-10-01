@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Especificaciones Oficiales de Taller (Sec. 2)</title>
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --spec-blue: #38bdf8;
+      --spec-glow: rgba(56, 189, 248, 0.35);
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --honda-red: #ef4444;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--spec-blue);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--spec-glow);
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--spec-blue);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--spec-blue);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--spec-blue); }
+    .item-card.active .item-sec { color: var(--spec-blue); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--spec-blue);
+      border-color: var(--spec-blue);
+      color: #000;
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--spec-blue);
+      color: #000;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">SPECS</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Especificaciones y Tolerancias de Taller (Sec. 2)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar compresión, tolerancias, holgura, bujías, aceite...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">📋 Todas las Especificaciones</option>
+        <option value="LIMITS_ENG">⚙️ Límites de Servicio del Motor K24Z1</option>
+        <option value="LIMITS_TRANS">🔄 Límites de Caja Automática y 4WD</option>
+        <option value="LIMITS_CHASSIS">🛑 Chasis: Frenos, Dirección y Suspensión</option>
+        <option value="DESIGN">📐 Especificaciones de Diseño y Capacidades</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú Especificaciones</button>
+        <span id="sheet-title">Página 2-2</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Oficial de Especificaciones Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE ESPECIFICACIONES OFICIALES (SECCIÓN 2 COMPLETA)
+    const especificaciones = [
+      { grupo: "LIMITS_ENG", sec: "2-1", pag: 13, titulo: "Índice de Especificaciones y Tolerancias", desc: "Tabla general de estándares, límites de servicio de motor, transeje, chasis y diseño." },
+      { grupo: "LIMITS_ENG", sec: "2-2", pag: 14, titulo: "Eléctrico de Motor y Compresión K24Z1", desc: "Bujías NGK/Denso (1.0-1.1 mm), tiempo 8° BTDC, alternador (105A), compresión mín 135 psi (máx var 28 psi)." },
+      { grupo: "LIMITS_ENG", sec: "2-3", pag: 15, titulo: "Culata, Válvulas y Árboles de Levas", desc: "Alabeo culata (máx 0.05 mm), holgura válvulas en frío (Adm: 0.21-0.25 mm, Esc: 0.28-0.32 mm), levas y guías." },
+      { grupo: "LIMITS_ENG", sec: "2-4", pag: 16, titulo: "Bloque de Cilindros, Pistones y Cigüeñal", desc: "Diámetro 87.0 mm, holgura pistón (0.02-0.04 mm), anillos (top 0.20-0.35 mm), metales biela y bancadas." },
+      { grupo: "LIMITS_ENG", sec: "2-5", pag: 17, titulo: "Lubricación del Motor y Sistema de Enfriamiento", desc: "Presión aceite (mín 10 psi ralentí, 44 psi a 3000 rpm), termostato (76-80°C), tapón radiador (14-18 psi)." },
+      { grupo: "LIMITS_ENG", sec: "2-6", pag: 18, titulo: "Combustible, Emisiones y Ralentí Oficial", desc: "Presión combustible (47-54 psi), tanque 58.0 L, ralentí sin carga (650±50 rpm), con carga (700±50 rpm)." },
+      { grupo: "LIMITS_TRANS", sec: "2-7", pag: 19, titulo: "Transmisión Automática y Presiones de Embrague", desc: "Capacidad ATF-Z1 (2.6 L cambio / 7.0 L total), presión de línea (140-142 psi), stall speed (2445 rpm)." },
+      { grupo: "LIMITS_TRANS", sec: "2-8", pag: 20, titulo: "Ejes Principal, Contraeje y Holguras de Discos", desc: "Espesores de platos de embrague 1 al 5, juego axial de engranes y retenes de sellado de presión." },
+      { grupo: "LIMITS_TRANS", sec: "2-9", pag: 21, titulo: "Eje Secundario y Arandelas de Empuje (Shims)", desc: "Lainas de empuje 37x58 mm y 40x51.5 mm, tubos de alimentación de embrague y tolerancias de agujas." },
+      { grupo: "LIMITS_TRANS", sec: "2-10", pag: 22, titulo: "Cuerpo de Válvulas Principal y Bomba de ATF", desc: "Resortes de válvulas de cambio A-E, holgura de engranes de bomba de fluido ATF y horquilla de reversa." },
+      { grupo: "LIMITS_TRANS", sec: "2-11", pag: 23, titulo: "Resortes Reguladores y Diferencial Delantero", desc: "Longitud libre de resortes de acumuladores 1 al 5, precarga de baleros de diferencial (2.7-3.9 N·m)." },
+      { grupo: "LIMITS_TRANS", sec: "2-12", pag: 24, titulo: "Caja de Transferencia y Diferencial Trasero", desc: "Juego de engranes de transfer (0.06-0.16 mm), Dual Pump Fluid (1.2 L cambio / 1.4 L total) y dirección." },
+      { grupo: "LIMITS_CHASSIS", sec: "2-12", pag: 24, titulo: "Dirección Asistida y Geometría de Suspensión", desc: "Presión bomba dirección (1070-1170 psi), juego libre volante (0-10 mm), camber, caster y toe-in." },
+      { grupo: "LIMITS_CHASSIS", sec: "2-13", pag: 25, titulo: "Frenos, Freno de Mano y Aire Acondicionado", desc: "Espesor pastillas (del 1.6 mm / tras 1.6 mm), tambor freno mano (máx 201 mm), gas R-134a (440-490 g)." },
+      { grupo: "DESIGN", sec: "2-14", pag: 26, titulo: "Dimensiones del Vehículo y Motor K24Z1", desc: "Largo 4518 mm, ancho 1820 mm, entre ejes 2620 mm, compresión 9.7:1, cilindrada 2354 cc, 87x99 mm." },
+      { grupo: "DESIGN", sec: "2-15", pag: 27, titulo: "Relaciones de Engranes A/T, Dirección y Frenos", desc: "Relaciones: 1ra 2.786, 2da 1.614, 3ra 1.082, 4ta 0.773, 5ta 0.566, Rev 2.000, final 4.500. Llantas 225/65R17." },
+      { grupo: "DESIGN", sec: "2-16", pag: 28, titulo: "Capacidad de Clima, Fusibles y Focos Oficiales", desc: "Compresor Scroll 97.9 mL, bombillos: altas 55W (HB3), bajas 50W (H11), cuartos 21/5W y batería 12V 47Ah." },
+      { grupo: "DESIGN", sec: "2-17", pag: 29, titulo: "Plano Dimensional de Carrocería de Fábrica", desc: "Diagrama exterior de cotas: ancho de vía delantera 1565 mm, trasera 1565 mm y despeje." }
+    ];
+
+    let itemsFiltrados = [...especificaciones];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas oficiales`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...especificaciones];
+      } else {
+        itemsFiltrados = especificaciones.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...especificaciones];
+      } else {
+        itemsFiltrados = especificaciones.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Carga directa de la lámina de tolerancias de motor (Pág. 14 / Sec. 2-2)
+      const initIdx = especificaciones.findIndex(i => i.pag === 14);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

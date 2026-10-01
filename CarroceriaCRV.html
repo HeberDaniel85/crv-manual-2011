@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Carrocería Oficial (Body Sec. 20)</title>
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --body-teal: #14b8a6;
+      --body-glow: rgba(20, 184, 166, 0.35);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --honda-red: #ef4444;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--body-teal);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--body-glow);
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(20, 184, 166, 0.2);
+      border-color: var(--body-teal);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--body-teal); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--body-teal);
+      border-color: var(--body-teal);
+      color: #000;
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--body-teal);
+      color: #000;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">BODY</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Carrocería, Puertas y Chasis (Sección 20)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar puerta, fascia, cofre, compuerta, chasis, vidrio...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">🚗 Toda la Carrocería</option>
+        <option value="DOORS">🚪 Puertas, Ajustes, Chapas y Elevadores</option>
+        <option value="HOOD_TAIL">🚙 Cofre, Compuerta Trasera y Salpicaderas</option>
+        <option value="BUMPERS">🛡️ Fascias Delantera y Trasera, Tolvas</option>
+        <option value="GLASS">🪟 Parabrisas, Cristales y Espejos</option>
+        <option value="INTERIOR">💺 Molduras Interiores, Tablero y Consola</option>
+        <option value="FRAME">📐 Cotas de Enderezado y Banco de Chasis</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú Carrocería</button>
+        <span id="sheet-title">Página 20-8</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Oficial de Carrocería Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE CARROCERÍA (SECCIÓN 20 COMPLETA)
+    const carroceria = [
+      { grupo: "DOORS", sec: "20-1", pag: 1402, titulo: "Índice de la Sección de Carrocería", desc: "Tabla de contenido maestro: Puertas, cofre, compuerta, fascias, interiores, cristales y chasis." },
+      { grupo: "DOORS", sec: "20-2", pag: 1403, titulo: "Herramientas Especiales de Carrocería", desc: "Extractor de paneles KTC, ventosas de sujeción de cristales y cuchilla neumática de uretano." },
+      { grupo: "DOORS", sec: "20-3", pag: 1404, titulo: "Ubicación de Componentes de Carrocería", desc: "Vista general de paneles desmontables, bisagras, travesaños y molduras exteriores." },
+      { grupo: "DOORS", sec: "20-8", pag: 1409, titulo: "Alineación y Holguras de Puertas (Door Fit)", desc: "Holgura estándar: 3.5 a 4.0 mm en separaciones; enrasado 0.0 ± 1.0 mm con paneles adyacentes." },
+      { grupo: "DOORS", sec: "20-9", pag: 1410, titulo: "Ajuste de Bisagras y Contra-cerradura (Striker)", desc: "Pernos de bisagra 8x1.25mm a 29 N·m. Contra-cerradura en pilar B/C apretada a 18 N·m." },
+      { grupo: "DOORS", sec: "20-10", pag: 1411, titulo: "Desmontaje de la Puerta Delantera Completa", desc: "Desconexión del mazo de cables en pilar A, tirante de retención (9.8 N·m) y pernos de bisagra." },
+      { grupo: "DOORS", sec: "20-12", pag: 1413, titulo: "Desmontaje del Panel Guarnecido de Puerta", desc: "Retiro de cubierta de manija interior, tornillos ocultos y grapas perimetrales sin doblar lámina." },
+      { grupo: "DOORS", sec: "20-16", pag: 1417, titulo: "Mecanismo de Elevador de Cristal Delantero", desc: "Retiro de cristal aflojando pernos de corredera a 9.8 N·m y motor con riel regulador (9.8 N·m)." },
+      { grupo: "DOORS", sec: "20-18", pag: 1419, titulo: "Cerradura y Actuador de Puerta Delantera", desc: "Tornillos Torx de cerradura en el canto a 9.8 N·m y varillas de vinculación de manija." },
+      { grupo: "DOORS", sec: "20-22", pag: 1423, titulo: "Desmontaje de Puerta Trasera Completa", desc: "Retiro de tirante (9.8 N·m), arnés eléctrico en pilar B y pernos de bisagra a 29 N·m." },
+      { grupo: "DOORS", sec: "20-24", pag: 1425, titulo: "Panel Guarnecido y Cristal de Puerta Trasera", desc: "Extracción de moldura, cristal fijo pequeño y mecanismo regulador de ventana trasera." },
+      { grupo: "GLASS", sec: "20-36", pag: 1437, titulo: "Reemplazo de Luna de Espejo Retrovisor", desc: "Desenganche inferior de clips con destornillador protegido y desconexión de desempañador." },
+      { grupo: "GLASS", sec: "20-37", pag: 1438, titulo: "Desmontaje del Espejo Retrovisor Lateral", desc: "Cubierta triangular interior, 3 tuercas de brida 6mm apretadas a 9.8 N·m (7.2 lbf·ft)." },
+      { grupo: "HOOD_TAIL", sec: "20-40", pag: 1441, titulo: "Desmontaje y Ajuste del Cofre (Hood)", desc: "Pernos de bisagras 6x1.0mm a 9.8 N·m. Topes de goma giratorios para nivelación con salpicaderas." },
+      { grupo: "HOOD_TAIL", sec: "20-42", pag: 1443, titulo: "Cerradura del Cofre y Chicote de Apertura", desc: "3 pernos de cerradura a 9.8 N·m. Ruteo del cable hacia la palanca del habitáculo." },
+      { grupo: "HOOD_TAIL", sec: "20-45", pag: 1446, titulo: "Compuerta Trasera (Tailgate): Desmontaje", desc: "Soporte con gato acolchado, desconexión de arnés en techo, struts de gas y bisagras a 26 N·m." },
+      { grupo: "HOOD_TAIL", sec: "20-47", pag: 1448, titulo: "Ajuste de Alineación de Compuerta Trasera", desc: "Holgura perimetral con calaveras y techo: 4.5 ± 1.0 mm. Ajuste de contra-cerradura a 18 N·m." },
+      { grupo: "HOOD_TAIL", sec: "20-49", pag: 1450, titulo: "Cerradura de Compuerta y Actuador Eléctrico", desc: "Pernos de cerrojo a 9.8 N·m. Microinterruptor de aviso de cajuela abierta en el tablero." },
+      { grupo: "HOOD_TAIL", sec: "20-56", pag: 1457, titulo: "Reemplazo de la Salpicadera Delantera (Fender)", desc: "Retiro de tolva guardafangos, pernos superiores bajo cofre y perno inferior en estribo (9.8 N·m)." },
+      { grupo: "BUMPERS", sec: "20-65", pag: 1466, titulo: "Desmontaje de la Fascia Delantera (Front Bumper)", desc: "Retiro de cubierta superior de radiador, clips de 10mm, tornillos en salpicadera y desenganche lateral." },
+      { grupo: "BUMPERS", sec: "20-68", pag: 1469, titulo: "Viga Paragolpes Delantera de Acero (Beam)", desc: "Pernos de montaje de la viga de impacto al chasis 8x1.25mm apretados a 22 N·m (16 lbf·ft)." },
+      { grupo: "BUMPERS", sec: "20-72", pag: 1473, titulo: "Desmontaje de la Fascia Trasera (Rear Bumper)", desc: "Desmontaje de calaveras, clips inferiores de tolva y extracción de las guías de costado." },
+      { grupo: "BUMPERS", sec: "20-75", pag: 1476, titulo: "Viga Paragolpes Trasera de Impacto", desc: "Tuercas y pernos de soporte al bastidor trasero apretados a 22 N·m (16 lbf·ft)." },
+      { grupo: "GLASS", sec: "20-80", pag: 1481, titulo: "Parabrisas: Desmontaje con Alambre de Corte", desc: "Retiro de molduras laterales, brazos de limpiaparabrisas y corte perimetral de uretano." },
+      { grupo: "GLASS", sec: "20-83", pag: 1484, titulo: "Instalación de Parabrisas y Adhesivo de Uretano", desc: "Imprimador para vidrio y carrocería. Cordón triangular de 8x12 mm; tiempo de curado 4 horas." },
+      { grupo: "GLASS", sec: "20-88", pag: 1489, titulo: "Reemplazo de Cristales Fijos Laterales del Costado", desc: "Corte de sellador en cristales del pilar C/D e instalación con tacos de posicionamiento." },
+      { grupo: "GLASS", sec: "20-91", pag: 1492, titulo: "Reemplazo del Medallón Trasero con Desempañador", desc: "Desconexión de terminales térmicas, corte de pegamento y reinstalación con uretano estructural." },
+      { grupo: "INTERIOR", sec: "20-95", pag: 1496, titulo: "Desmontaje de la Consola Central de Piso", desc: "Retiro de paneles laterales bajos, portavasos, tornillos inferiores y arnés de tomacorrientes." },
+      { grupo: "INTERIOR", sec: "20-100", pag: 1501, titulo: "Tablero de Instrumentos (Dashboard): Desmontaje", desc: "Precaución SRS, desconexión de mangueras de calefacción, columna de dirección y pernos 8mm a 22 N·m." },
+      { grupo: "INTERIOR", sec: "20-120", pag: 1521, titulo: "Revestimiento del Techo (Headliner): Extracción", desc: "Precaución bolsas de cortina. Desmontaje de asideras, viseras, plafones y salida por compuerta." },
+      { grupo: "FRAME", sec: "20-165", pag: 1604, titulo: "Plano de Medidas de Chasis (Vista Inferior)", desc: "Líneas base y diagonales entre puntos de control de subchasis delantero y brazos traseros." },
+      { grupo: "FRAME", sec: "20-166", pag: 1605, titulo: "Plano de Medidas de Chasis (Vista Lateral)", desc: "Alturas de torretas de suspensión delantera, montajes de motor y anclajes de subframe." },
+      { grupo: "FRAME", sec: "20-167", pag: 1606, titulo: "Plano de Medidas de Chasis (Cuerpo Trasero)", desc: "Puntos de verificación de largueros traseros B, túnel de piso y alojamiento de rueda de refacción." }
+    ];
+
+    let itemsFiltrados = [...carroceria];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas técnicas`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...carroceria];
+      } else {
+        itemsFiltrados = carroceria.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...carroceria];
+      } else {
+        itemsFiltrados = carroceria.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Carga directa de la lámina de ajuste y holgura de puertas (Pág. 1409 / Sec. 20-8)
+      const initIdx = carroceria.findIndex(i => i.pag === 1409);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

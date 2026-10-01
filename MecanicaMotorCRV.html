@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Mecánica del Motor K24Z1</title>
+  <style>
+    :root {
+      --bg-dark: #080c14;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --honda-red: #dc2626;
+      --amber: #f59e0b;
+      --emerald: #10b981;
+      --cyan: #38bdf8;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--honda-red);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(220, 38, 38, 0.2);
+      border-color: var(--honda-red);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--honda-red); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--honda-red);
+      border-color: var(--honda-red);
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--honda-red);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">K24Z1</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Mecánica del Motor (Engine Mechanical)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar cadena, culata, pistón, torque, biela...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">🔧 Toda la Mecánica del Motor</option>
+        <option value="ASSEMBLY">📦 Conjunto Motor y Soportes (Sec. 5)</option>
+        <option value="HEAD">⚙️ Culata y Distribución (Sec. 6)</option>
+        <option value="BLOCK">🔩 Bloque de Cilindros y Cárter (Sec. 7)</option>
+        <option value="LUBRICATION">🛢️ Lubricación y Bomba Aceite (Sec. 8)</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú Mecánico</button>
+        <span id="sheet-title">Página 6-16</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Mecánica Oficial Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE MECÁNICA DE MOTOR K24Z1 (SECCIONES 5, 6, 7 Y 8)
+    const mecanicaMotor = [
+      // SECCIÓN 5: ENGINE ASSEMBLY & MOUNTS
+      { grupo: "ASSEMBLY", sec: "5-2", pag: 88, titulo: "Herramientas Especiales: Desmontaje de Motor", desc: "Cáncamo universal 07AAK-SNAA120 y soporte de motor AAR-T-12566." },
+      { grupo: "ASSEMBLY", sec: "5-3", pag: 89, titulo: "Desmontaje del Conjunto Motor (Paso 1-9)", desc: "Despresurización de combustible, batería, arneses y fusilera." },
+      { grupo: "ASSEMBLY", sec: "5-5", pag: 91, titulo: "Drenado de Fluidos y Desconexión Inferior", desc: "Drenado de refrigerante, aceite de motor y ATF. Retiro de catalizador." },
+      { grupo: "ASSEMBLY", sec: "5-7", pag: 93, titulo: "Compresor A/C y Radiador", desc: "Desmontaje de compresor A/C sin desconectar mangueras y retiro de radiador." },
+      { grupo: "ASSEMBLY", sec: "5-9", pag: 95, titulo: "Desmonte del Subchasis Delantero", desc: "Adaptador de subframe VSB02C000016 y pernos de montaje." },
+      { grupo: "ASSEMBLY", sec: "5-11", pag: 97, titulo: "Descenso del Conjunto Motor/Transmisión", desc: "Procedimiento de descenso con polipasto y liberación de carrocería." },
+      { grupo: "ASSEMBLY", sec: "5-12", pag: 98, titulo: "Torques de Soportes de Accesorios", desc: "Soporte de motor lateral (44 N·m y 81 N·m), soporte A/C (44 N·m)." },
+      { grupo: "ASSEMBLY", sec: "5-14", pag: 100, titulo: "Instalación del Conjunto y Soporte Lateral", desc: "Perno y tuerca de montaje lateral 14x1.5mm: 74 N·m (54 lbf·ft)." },
+      { grupo: "ASSEMBLY", sec: "5-15", pag: 101, titulo: "Instalación del Soporte de Transmisión", desc: "Pernos de soporte 12x1.25mm: 64 N·m y 74 N·m. Subframe: 103 N·m." },
+      { grupo: "ASSEMBLY", sec: "5-16", pag: 102, titulo: "Tirante de Torque Inferior (Lower Torque Rod)", desc: "Secuencia de apriete: Perno 1 (14mm) 93 N·m, Perno 2 (12mm) 88 N·m." },
+      { grupo: "ASSEMBLY", sec: "5-22", pag: 108, titulo: "Reemplazo de Soporte Lateral de Motor", desc: "Pernos 12x1.25mm: 57 N·m y 64 N·m. Apoyo de cárter con bloque de madera." },
+      { grupo: "ASSEMBLY", sec: "5-24", pag: 110, titulo: "Reemplazo de Soporte de Transmisión", desc: "Desmonte de base de PCM y filtro de aire para acceso a pernos." },
+      { grupo: "ASSEMBLY", sec: "5-27", pag: 113, titulo: "Tirante de Torque Superior (Upper Torque Rod)", desc: "Secuencia y apriete de pernos nuevos: 54 N·m y 74 N·m." },
+
+      // SECCIÓN 6: CYLINDER HEAD & TIMING CHAIN
+      { grupo: "HEAD", sec: "6-2", pag: 118, titulo: "Herramientas Especiales: Culata y Válvulas", desc: "Traba de polea de cigüeñal 070AB-RJA0100, compresor de resortes y adaptadores VTEC." },
+      { grupo: "HEAD", sec: "6-3", pag: 119, titulo: "Ubicación de Componentes: Distribución", desc: "Cadena de tiempo, tensor hidráulico, guías A y B, sensor CKP y solenoide VTC." },
+      { grupo: "HEAD", sec: "6-4", pag: 120, titulo: "Ubicación de Árboles y Balancines", desc: "Actuador VTC, sprockets, sensores CMP A/B y ensamble de balancines." },
+      { grupo: "HEAD", sec: "6-5", pag: 121, titulo: "Despiece de Válvulas y Resortes", desc: "Sellos de válvula de admisión y escape, retenedores, cuñas y solenoide VTEC." },
+      { grupo: "HEAD", sec: "6-6", pag: 122, titulo: "Prueba de Compresión del Motor", desc: "Mínimo: 930 kPa (135 psi). Variación máxima entre cilindros: 200 kPa (28 psi)." },
+      { grupo: "HEAD", sec: "6-7", pag: 123, titulo: "Prueba de Presión de Aire del Sistema VTEC", desc: "Presión requerida: 290 kPa (42 psi) para verificar acople de balancines." },
+      { grupo: "HEAD", sec: "6-8", pag: 124, titulo: "Inspección y Bloqueo del Actuador VTC", desc: "Verificación del pin de bloqueo girando el actuador en sentido horario." },
+      { grupo: "HEAD", sec: "6-9", pag: 125, titulo: "Calibración de Holgura de Válvulas (Paso 1)", desc: "Pistón 1 en PMS. Puntos de sincronización del engranaje VTC y escape alineados." },
+      { grupo: "HEAD", sec: "6-10", pag: 126, titulo: "Holgura y Torques de Tuercas de Válvula", desc: "Admisión: 0.21-0.25 mm (20 N·m). Escape: 0.28-0.32 mm (14 N·m)." },
+      { grupo: "HEAD", sec: "6-12", pag: 128, titulo: "Polea de Cigüeñal (Damper): Extracción y Apriete", desc: "Perno 19mm: 49 N·m (36 lbf·ft) + 90° adicionales. Nunca usar impacto para apretar." },
+      { grupo: "HEAD", sec: "6-13", pag: 129, titulo: "Desmontaje de la Cadena de Tiempo", desc: "Alineación de PMS, retiro de solenoide VTC y tapa de distribución." },
+      { grupo: "HEAD", sec: "6-15", pag: 131, titulo: "Compresión del Auto-Tensor de Cadena", desc: "Inserción de pasador de 1.2 mm (P/N 14511-PNA-003) para bloquear el tensor." },
+      { grupo: "HEAD", sec: "6-16", pag: 132, titulo: "Instalación de Cadena y Puntos de Tiempo", desc: "Eslabones de color alineados con marcas de piñón de cigüeñal y actuador VTC." },
+      { grupo: "HEAD", sec: "6-17", pag: 133, titulo: "Instalación de Guías y Auto-Tensor", desc: "Guía A y tensor arm: perno 6mm (12 N·m), perno 8mm (22 N·m). Tensor: 12 N·m." },
+      { grupo: "HEAD", sec: "6-18", pag: 134, titulo: "Sellador Líquido (Hondabond) en Tapa de Cadena", desc: "Aplicación de silicón en tapa de cadena y colocación dentro de 5 minutos." },
+      { grupo: "HEAD", sec: "6-22", pag: 138, titulo: "Reemplazo del Auto-Tensor de Cadena", desc: "Acceso por tapa de inspección pequeña sin desmontar toda la tapa frontal." },
+      { grupo: "HEAD", sec: "6-24", pag: 140, titulo: "Retén de Aceite de Tapa de Cadena", desc: "Profundidad de instalación del retén de cigüeñal delantero: 33.0 - 33.7 mm." },
+      { grupo: "HEAD", sec: "6-25", pag: 141, titulo: "Límite de Estiramiento de Cadena", desc: "Longitud de salida del vástago del tensor: límite de servicio 13.5 mm." },
+      { grupo: "HEAD", sec: "6-29", pag: 145, titulo: "Desmontaje de Tapa de Válvulas", desc: "Retiro de bobinas, válvula de purga EVAP y arnés." },
+      { grupo: "HEAD", sec: "6-30", pag: 146, titulo: "Instalación y Secuencia de Tapa de Válvulas", desc: "Puntos de silicón en juntas T y apriete en cruz a 12 N·m (8.7 lbf·ft)." },
+      { grupo: "HEAD", sec: "6-31", pag: 147, titulo: "Desmontaje de Culata (Cylinder Head)", desc: "Aflojar pernos de culata en secuencia de afuera hacia adentro en 3 pasos." },
+      { grupo: "HEAD", sec: "6-35", pag: 151, titulo: "Sprockets de Árboles de Levas", desc: "Perno actuador VTC (12mm): 113 N·m. Perno sprocket escape (10mm): 72 N·m." },
+      { grupo: "HEAD", sec: "6-36", pag: 152, titulo: "Inspección de Deformación de Culata", desc: "Límite de alabeo: 0.05 mm (0.002 in). Altura nominal: 103.95 - 104.05 mm." },
+      { grupo: "HEAD", sec: "6-37", pag: 153, titulo: "Desmontaje del Ensamble de Balancines", desc: "Secuencia para aflojar bancadas de árboles de levas de manera uniforme." },
+      { grupo: "HEAD", sec: "6-40", pag: 156, titulo: "Inspección de Árboles y Juego Axial", desc: "Torques de tapas: 8mm a 22 N·m, 6mm a 12 N·m. Juego axial máx: 0.4 mm." },
+      { grupo: "HEAD", sec: "6-48", pag: 164, titulo: "Instalación de Sellos de Válvula", desc: "Sello de escape con resorte negro, admisión con resorte blanco (No intercambiables)." },
+      { grupo: "HEAD", sec: "6-49", pag: 165, titulo: "Instalación de Balancines y Árboles", desc: "Secuencia numérica de apriete de pernos de bancadas de leva (8mm: 22 N·m)." },
+      { grupo: "HEAD", sec: "6-50", pag: 166, titulo: "Inspección de Pernos de Culata", desc: "Medir diámetro en puntos A y B. Si mide menos de 10.6 mm, reemplazar el perno." },
+      { grupo: "HEAD", sec: "6-51", pag: 167, titulo: "Torque y Secuencia de Culata (Paso Crítico)", desc: "Fase 1: 39 N·m (en espiral). Fase 2: +90°. Fase 3: +90° (Pernos nuevos +90° extra)." },
+
+      // SECCIÓN 7: ENGINE BLOCK & RECIPROCATING ASSEMBLY
+      { grupo: "BLOCK", sec: "7-2", pag: 172, titulo: "Herramientas Especiales de Bloque", desc: "Instalador de retén trasero de cigüeñal 96 mm 07ZAD-PNAA100." },
+      { grupo: "BLOCK", sec: "7-3", pag: 173, titulo: "Despiece de Cigüeñal, Metales y Bloque Inferior", desc: "Metales de bancada, axiales, deflector de aceite (baffle plate) y bancada inferior." },
+      { grupo: "BLOCK", sec: "7-4", pag: 174, titulo: "Despiece de Pistones, Anillos y Bielas", desc: "Orientación del pistón, pasadores, tolerancias y metales de biela." },
+      { grupo: "BLOCK", sec: "7-5", pag: 175, titulo: "Juego Axial de Biela y Cigüeñal", desc: "Biela: 0.15-0.35 mm (Límite 0.40 mm). Cigüeñal: 0.10-0.35 mm (Límite 0.45 mm)." },
+      { grupo: "BLOCK", sec: "7-6", pag: 176, titulo: "Luz de Aceite de Bancada (Plastigage)", desc: "Bancadas 1, 2, 4, 5: 0.017-0.041 mm. Bancada 3: 0.025-0.049 mm." },
+      { grupo: "BLOCK", sec: "7-7", pag: 177, titulo: "Selección de Metales de Bancada por Códigos", desc: "Lectura de códigos estampados en el bloque y cigüeñal para elegir colores." },
+      { grupo: "BLOCK", sec: "7-8", pag: 178, titulo: "Luz de Aceite de Biela (Plastigage)", desc: "Holgura estándar: 0.020-0.050 mm. Límite de servicio: 0.060 mm." },
+      { grupo: "BLOCK", sec: "7-9", pag: 179, titulo: "Selección de Metales de Biela por Colores", desc: "Tabla cruzada de códigos de biela y muñón de cigüeñal." },
+      { grupo: "BLOCK", sec: "7-11", pag: 181, titulo: "Desmontaje del Cárter de Aceite (Oil Pan)", desc: "Separación del cárter sin rayar las superficies mecanizadas del bloque." },
+      { grupo: "BLOCK", sec: "7-13", pag: 183, titulo: "Extracción de Cigüeñal y Bloque Inferior", desc: "Aflojar pernos de bancada de 1/3 de vuelta a la vez para evitar deformaciones." },
+      { grupo: "BLOCK", sec: "7-16", pag: 186, titulo: "Inspección de Diámetro de Cilindros y Pistones", desc: "Diámetro de cilindro estándar: 87.000 - 87.020 mm. Límite: 87.070 mm." },
+      { grupo: "BLOCK", sec: "7-18", pag: 188, titulo: "Bruñido de Cilindros (Honing)", desc: "Patrón cruzado a 60° con piedra grano 400." },
+      { grupo: "BLOCK", sec: "7-21", pag: 191, titulo: "Armado de Pistón y Biela", desc: "Calentar pistón a 70°C (158°F). Flecha del pistón y marca en biela al mismo lado." },
+      { grupo: "BLOCK", sec: "7-22", pag: 192, titulo: "Luz entre Puntas de Anillos de Pistón", desc: "Anillo superior: 0.20-0.35 mm. Segundo anillo: 0.40-0.55 mm. Aceite: 0.25-0.65 mm." },
+      { grupo: "BLOCK", sec: "7-23", pag: 193, titulo: "Orientación y Desfase de Anillos", desc: "Marcas 1R y 2R hacia arriba. Separar las puntas de los anillos 90° entre sí." },
+      { grupo: "BLOCK", sec: "7-24", pag: 194, titulo: "Instalación de Pistones y Torque de Bielas", desc: "Pernos de biela: 20 N·m (14 lbf·ft) + 90° adicionales." },
+      { grupo: "BLOCK", sec: "7-25", pag: 195, titulo: "Inspección de Pernos de Biela", desc: "Diferencia de diámetro entre punto A y B: máximo 0.1 mm (sustituir si cede)." },
+      { grupo: "BLOCK", sec: "7-26", pag: 196, titulo: "Instalación de Cigüeñal y Bloque Inferior", desc: "Aplicar sellador líquido en bloque inferior y asentar muñones lubricados." },
+      { grupo: "BLOCK", sec: "7-27", pag: 197, titulo: "Torque de Bancada Principal (Lower Block)", desc: "Pernos principales: 29 N·m (22 lbf·ft) + 56°. Pernos de 8mm en secuencia: 22 N·m." },
+      { grupo: "BLOCK", sec: "7-29", pag: 199, titulo: "Instalación y Secuencia del Cárter", desc: "Cordón de Hondabond continuo y apriete en cruz a 12 N·m (8.7 lbf·ft)." },
+      { grupo: "BLOCK", sec: "7-31", pag: 201, titulo: "Retén Trasero de Cigüeñal (Lado Transmisión)", desc: "Instalación con útil 07ZAD-PNAA100 a profundidad de 0.2 - 1.2 mm." },
+
+      // SECCIÓN 8: ENGINE LUBRICATION & BALANCE SHAFTS
+      { grupo: "LUBRICATION", sec: "8-3", pag: 205, titulo: "Ubicación de Componentes de Lubricación", desc: "Bomba de aceite, balanceadores, bulbo de presión, filtro y toberas." },
+      { grupo: "LUBRICATION", sec: "8-8", pag: 210, titulo: "Bulbo de Presión de Aceite (Oil Pressure Switch)", desc: "Torque: 18 N·m (13 lbf·ft). Aplicar teflón líquido sin tapar el orificio." },
+      { grupo: "LUBRICATION", sec: "8-9", pag: 211, titulo: "Prueba de Presión de Aceite con Manómetro", desc: "En ralentí: mín. 70 kPa (10 psi). A 3,000 rpm: mín. 300 kPa (44 psi) a 80°C." },
+      { grupo: "LUBRICATION", sec: "8-10", pag: 212, titulo: "Cambio de Aceite y Capacidades", desc: "Tapón cárter: 39 N·m. Capacidad: 4.2 L (con filtro), 5.3 L (reparación general)." },
+      { grupo: "LUBRICATION", sec: "8-11", pag: 213, titulo: "Filtro de Aceite: Procedimiento y Apriete", desc: "Llave 07AAA-PLLA100. Apretar 3/4 de vuelta o a 12 N·m (8.7 lbf·ft)." },
+      { grupo: "LUBRICATION", sec: "8-14", pag: 216, titulo: "Despiece de Bomba de Aceite y Ejes Balanceadores", desc: "Rotores, válvula de alivio (39 N·m), engranaje de bomba y carcasa." },
+      { grupo: "LUBRICATION", sec: "8-16", pag: 218, titulo: "Tolerancias de Rotores de Bomba de Aceite", desc: "Luz rotor interno-externo máx: 0.20 mm. Luz axial máx: 0.12 mm." },
+      { grupo: "LUBRICATION", sec: "8-17", pag: 219, titulo: "Inspección de Ejes Balanceadores", desc: "Juego axial ejes delantero y trasero: 0.063-0.108 mm (Límite 0.14 mm)." },
+      { grupo: "LUBRICATION", sec: "8-21", pag: 223, titulo: "Sincronización e Instalación de Bomba de Aceite", desc: "Traba de 6 mm en orificio de servicio, pernos de bomba: 44 N·m (33 lbf·ft)." }
+    ];
+
+    let itemsFiltrados = [...mecanicaMotor];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas técnicas`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...mecanicaMotor];
+      } else {
+        itemsFiltrados = mecanicaMotor.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...mecanicaMotor];
+      } else {
+        itemsFiltrados = mecanicaMotor.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Abre por defecto en la sincronización de la cadena de tiempo (Pág. 132 / Sec. 6-16)
+      const initIdx = mecanicaMotor.findIndex(i => i.pag === 132);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

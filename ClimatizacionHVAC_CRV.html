@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Calefacción, Ventilación y A/C (Sec. 21)</title>
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --hvac-cyan: #06b6d4;
+      --hvac-glow: rgba(6, 182, 212, 0.35);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --honda-red: #ef4444;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--hvac-cyan);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--hvac-glow);
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: var(--hvac-cyan);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--hvac-cyan); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--hvac-cyan);
+      border-color: var(--hvac-cyan);
+      color: #000;
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--hvac-cyan);
+      color: #000;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">HVAC</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Calefacción y Aire Acondicionado (Sec. 21)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar compresor, R-134a, embrague, soplador, SP-10...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">❄️ Toda la Climatización (HVAC)</option>
+        <option value="REFRIG">🛢️ Carga, Aceite SP-10 y Torques de Líneas</option>
+        <option value="COMPRESSOR">⚙️ Compresor, Embrague y Bobina</option>
+        <option value="CABIN_AIR">💨 Soplador, Transistor, Compuertas y Filtro</option>
+        <option value="CONTROLS">🔌 Diagramas, Pinout 28P y Relés</option>
+        <option value="DIAG">🔍 Autodiagnóstico Manual y DTCs 1-9</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú HVAC</button>
+        <span id="sheet-title">Página 21-6</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Oficial de Climatización Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE HVAC (SECCIÓN 21 COMPLETA)
+    const climatizacionHVAC = [
+      { grupo: "DIAG", sec: "21-1", pag: 1608, titulo: "Índice General de Climatización (HVAC)", desc: "Tabla maestra: Herramientas, precauciones de R-134a, compresor, soplador y autodiagnóstico." },
+      { grupo: "DIAG", sec: "21-2", pag: 1609, titulo: "Herramienta Especial de Prueba Eléctrica", desc: "Juego de puntas traseras Backprobe 07SAZ-001000A para inspección en conector 28P." },
+      { grupo: "COMPRESSOR", sec: "21-3", pag: 1610, titulo: "Ubicación de Componentes en Motor", desc: "Compresor, condensador, filtro desecante, válvulas de servicio alta/baja y sensor de presión." },
+      { grupo: "CONTROLS", sec: "21-5", pag: 1612, titulo: "Ubicación de Componentes en Cabina", desc: "Caja evaporador/calefactor, soplador, transistor de potencia, motores de compuertas y módulo HVAC." },
+      { grupo: "REFRIG", sec: "21-6", pag: 1613, titulo: "Aceite Refrigerante PAG SP-10 y Precauciones", desc: "Condensador (50 mL), evaporador (40-50 mL), mangueras (10 mL). Separador centrífugo en compresor." },
+      { grupo: "REFRIG", sec: "21-7", pag: 1614, titulo: "Tabla de Torques: Líneas de Refrigerante A/C", desc: "Líneas de 6mm a 9.8 N·m, sensor presión 10.8 N·m, tuerca 16mm a 13.3 N·m y tuerca 24mm a 31.9 N·m." },
+      { grupo: "DIAG", sec: "21-8", pag: 1615, titulo: "Modo de Autodiagnóstico Manual del Tablero", desc: "Presionar Recirculación + 5 clics a Defogger en 10 seg. El testigo parpadea DTC 1 al 9." },
+      { grupo: "DIAG", sec: "21-9", pag: 1616, titulo: "Tabla de Códigos DTC de Climatización", desc: "DTC 1-3 (Air Mix), DTC 4-5 (Mode), DTC 6 (Blower), DTC 7 (Módulo interno), DTC 8-9 (Sensor Evap)." },
+      { grupo: "DIAG", sec: "21-10", pag: 1617, titulo: "Diagnóstico por Síntomas: Ventiladores y Compresor", desc: "Revisión si no encienden en baja o alta velocidad, fusibles No. 7 (20A), No. 6 (20A) y relés." },
+      { grupo: "REFRIG", sec: "21-11", pag: 1618, titulo: "Diagrama del Ciclo de Refrigeración R-134a", desc: "Lógica del sensor triple: corte por baja (<28 psi), corte por alta (>455 psi) y alta de fans (>213 psi)." },
+      { grupo: "COMPRESSOR", sec: "21-12", pag: 1619, titulo: "Separador de Aceite del Compresor (Scroll)", desc: "Mecanismo centrífugo que reduce el arrastre de aceite hacia el condensador aumentando eficiencia." },
+      { grupo: "CONTROLS", sec: "21-13", pag: 1620, titulo: "Curva de Voltaje del Sensor de Presión A/C", desc: "Respuesta eléctrica analógica de 0.29V a 4.57V entregada a la PCM (monitoreable en HDS)." },
+      { grupo: "CABIN_AIR", sec: "21-14", pag: 1621, titulo: "Posiciones de Compuertas de Distribución", desc: "Esquema de paso de aire en modos Ventilación (VENT), Doble nivel (HEAT/VENT) y Calefacción (HEAT)." },
+      { grupo: "CABIN_AIR", sec: "21-15", pag: 1622, titulo: "Posiciones de Compuertas de Desempañado", desc: "Esquema en modos Calefacción/Desempañador (HEAT/DEF) y Desempañador total (DEF)." },
+      { grupo: "CONTROLS", sec: "21-16", pag: 1623, titulo: "Pinout Módulo de Control HVAC (Conector 28P)", desc: "Terminales de motores de modo, mezcla, sensor evaporador, transistor, relé desempañador y tierras." },
+      { grupo: "CONTROLS", sec: "21-18", pag: 1625, titulo: "Diagrama Eléctrico Completo del Clima", desc: "Relé de compresor, relé de soplador, ventiladores de radiador/condensador, fusible 36 y diodos." },
+      { grupo: "DIAG", sec: "21-20", pag: 1627, titulo: "Diagnóstico DTC 1: Circuito Abierto Motor Air Mix", desc: "Prueba de continuidad entre terminales 6, 8, 19 del módulo 28P y conector 7P del motor de mezcla." },
+      { grupo: "DIAG", sec: "21-21", pag: 1628, titulo: "Diagnóstico DTC 2: Corto en Motor Air Mix", desc: "Prueba de aislamiento a tierra y entre líneas 6 y 8 del potenciómetro de mezcla." },
+      { grupo: "DIAG", sec: "21-22", pag: 1629, titulo: "Diagnóstico DTC 3: Atoramiento Mecánico Air Mix", desc: "Comprobación de alimentación a motor y verificación manual de compuerta trabada." },
+      { grupo: "DIAG", sec: "21-24", pag: 1631, titulo: "Diagnóstico DTC 4: Circuito Motor de Modos", desc: "Prueba de líneas MODE 1 a MODE 4 entre conector 28P de cabina y conector 7P del motor." },
+      { grupo: "DIAG", sec: "21-26", pag: 1633, titulo: "Diagnóstico DTC 5: Atoramiento Motor de Modos", desc: "Verificación de levas plásticas de distribución Vent/Defrost y alimentación en pines 25 y 26." },
+      { grupo: "CABIN_AIR", sec: "21-27", pag: 1634, titulo: "Diagnóstico DTC 6: Motor Soplador (Blower Motor)", desc: "Fusible No. 9 (40A) en motor y No. 36 (10A) en tablero. Puente directo a tierra en pin 2." },
+      { grupo: "CABIN_AIR", sec: "21-28", pag: 1635, titulo: "Prueba del Transistor de Potencia del Soplador", desc: "Puente entre terminales 2 y 4 para probar marcha a máxima velocidad del soplador." },
+      { grupo: "DIAG", sec: "21-31", pag: 1638, titulo: "Diagnóstico DTC 7 (Módulo) y DTC 8 (Sensor Evap)", desc: "DTC 7 = Reemplazo de módulo. DTC 8 = Circuito abierto en sensor de evaporador (pines 9 y 19)." },
+      { grupo: "DIAG", sec: "21-33", pag: 1640, titulo: "Diagnóstico DTC 9: Corto en Sensor Evaporador", desc: "Prueba de resistencia a tierra en terminal 9 (BRN). Valor menor a 24 ohms = corto." },
+      { grupo: "CABIN_AIR", sec: "21-34", pag: 1641, titulo: "Circuito del Motor de Recirculación de Aire", desc: "Prueba de compuerta Fresh / Recirculate y alimentación desde fusible 36 (10A)." },
+      { grupo: "CONTROLS", sec: "21-36", pag: 1643, titulo: "Alimentación y Tierra del Módulo HVAC", desc: "Perno IG2 en pin 27 (+12V bajo switch) y masa principal G503 en terminal 18 (BLK)." },
+      { grupo: "CONTROLS", sec: "21-37", pag: 1644, titulo: "Control de Baja Velocidad de Ventiladores", desc: "Prueba lógica de relé Fan Control, fusible No. 7 (20A) y masa de carrocería G301." },
+      { grupo: "CONTROLS", sec: "21-40", pag: 1647, titulo: "Prueba de Diodo A y Relé de Condensador", desc: "Prueba de continuidad unidireccional con multímetro en Diodo A de fusilera de motor." },
+      { grupo: "COMPRESSOR", sec: "21-43", pag: 1650, titulo: "Circuito del Embrague del Compresor (Clutch)", desc: "Fusible No. 20 (7.5A), relé de embrague magnético y señal enviada desde la PCM." },
+      { grupo: "CONTROLS", sec: "21-45", pag: 1652, titulo: "Circuito de Señal A/C a la PCM", desc: "Verificación de parámetros A/C SWITCH y A/C CLUTCH en lista de datos de HDS." },
+      { grupo: "COMPRESSOR", sec: "21-46", pag: 1653, titulo: "Prueba de Protector Térmico de Compresor", desc: "Continuidad entre pines 1 y 2 del conector 3P del compresor por debajo de 122°C." },
+      { grupo: "CABIN_AIR", sec: "21-48", pag: 1655, titulo: "Prueba de Banco del Sensor del Evaporador", desc: "Inmersión en agua con hielo (0°C = ~7.5 kΩ) y agua tibia (30°C = ~2.2 kΩ)." },
+      { grupo: "CABIN_AIR", sec: "21-49", pag: 1656, titulo: "Prueba de Banco del Transistor de Potencia", desc: "Resistencia de ~1.5 kΩ entre terminales 3 y 4. Fallas en soplador queman el transistor." },
+      { grupo: "CABIN_AIR", sec: "21-50", pag: 1657, titulo: "Prueba y Reemplazo del Motor Air Mix", desc: "Alimentación en pines 1 y 2. Resistencia de retroalimentación en pines 5 y 7: 4.2 a 7.8 kΩ." },
+      { grupo: "CABIN_AIR", sec: "21-51", pag: 1658, titulo: "Prueba y Reemplazo del Motor de Modos", desc: "Alimentación en pines 1 y 2 para conmutar entre Vent y Defrost. Retiro detrás de guantera." },
+      { grupo: "CABIN_AIR", sec: "21-52", pag: 1659, titulo: "Prueba y Reemplazo de Motor de Recirculación", desc: "Alimentación en pines 1 y 2 para abrir/cerrar toma de aire exterior sin desmontar soplador." },
+      { grupo: "CONTROLS", sec: "21-53", pag: 1660, titulo: "Desmontaje del Módulo de Control de Clima", desc: "Palanca en 1, cinta de protección y extracción con desarmadores rectos sin hacer palanca." },
+      { grupo: "CABIN_AIR", sec: "21-54", pag: 1661, titulo: "Reemplazo del Filtro de Polen y Cabina", desc: "Bajar guantera soltando tope derecho y extraer bandeja de filtro del evaporador." },
+      { grupo: "CABIN_AIR", sec: "21-55", pag: 1662, titulo: "Desmontaje del Ensamble del Soplador (Blower Unit)", desc: "Retiro de marco de guantera, ducto de calefacción del pasajero y pernos 6mm (9.8 N·m)." },
+      { grupo: "CABIN_AIR", sec: "21-57", pag: 1664, titulo: "Reemplazo del Núcleo Evaporador (Evaporator Core)", desc: "Recuperar R-134a, desconectar líneas en pared de fuego (9.8 N·m) y extraer caja central." },
+      { grupo: "COMPRESSOR", sec: "21-61", pag: 1668, titulo: "Desmontaje y Montaje del Compresor de A/C", desc: "Pernos de soporte 8x1.25mm: 22 N·m. Bridas de descarga y succión: 9.8 N·m con O-rings nuevos." },
+      { grupo: "COMPRESSOR", sec: "21-63", pag: 1670, titulo: "Inspección de Armadura y Polea del Compresor", desc: "Luz de entrehierro: 0.35-0.65 mm. Resistencia de bobina: 3.15-3.45 Ω a 20°C." },
+      { grupo: "COMPRESSOR", sec: "21-64", pag: 1671, titulo: "Despiece y Ajuste de Embrague del Compresor", desc: "Sujetador 07AAA-SVAA100 o Robinair 10204, tuerca central y extracción de seguros de retén." },
+      { grupo: "COMPRESSOR", sec: "21-65", pag: 1672, titulo: "Válvula de Alivio y Protector Térmico", desc: "Válvula de alivio: 7.4 N·m. Silicón aislante en la base del protector térmico (9.8 N·m)." },
+      { grupo: "COMPRESSOR", sec: "21-66", pag: 1673, titulo: "Reemplazo del Condensador de A/C", desc: "Retiro de fascia delantera, desconexión de manguera de descarga (9.8 N·m) y línea receptora." },
+      { grupo: "COMPRESSOR", sec: "21-67", pag: 1674, titulo: "Reemplazo del Filtro Desecante (Receiver/Dryer)", desc: "Tapón inferior del condensador con llave Allen de 14 mm. Agregar 10 mL de aceite SP-10." },
+      { grupo: "REFRIG", sec: "21-68", pag: 1675, titulo: "Recuperación de Refrigerante y Medición de Aceite", desc: "Estación de recuperación SAE J2210. Medir aceite extraído para reponer la misma cantidad." },
+      { grupo: "REFRIG", sec: "21-69", pag: 1676, titulo: "Evacuación y Prueba de Vacío del Circuito", desc: "Vacío profundo por 15 min: alcanzar más de 93.3 kPa (700 mmHg / 27.6 in.Hg)." },
+      { grupo: "REFRIG", sec: "21-70", pag: 1677, titulo: "Carga Nominal de Refrigerante R-134a", desc: "Cargar 440 a 490 g en fase líquida por puerto de alta con motor apagado. No sobrecargar." },
+      { grupo: "REFRIG", sec: "21-71", pag: 1678, titulo: "Prueba de Fugas con Detector Electrónico", desc: "Detector de halógeno con sensibilidad mínima de 14 g/año (0.5 oz/año) en uniones y compresor." },
+      { grupo: "REFRIG", sec: "21-72", pag: 1679, titulo: "Prueba Oficial de Rendimiento Térmico", desc: "Motor a 1,500 rpm, Max Cool, Vent, recirculación activa, termómetro en rejilla central." },
+      { grupo: "REFRIG", sec: "21-73", pag: 1680, titulo: "Gráfica de Presiones de Alta y Baja vs Humedad", desc: "Tabla psicrométrica: presiones normales de succión y descarga según temperatura ambiente." },
+      { grupo: "DIAG", sec: "21-74", pag: 1681, titulo: "Diagnóstico Manométrico de Fallas del Ciclo", desc: "Interpretación de alta excesiva, baja en vacío (expansión tapada) o presiones igualadas." }
+    ];
+
+    let itemsFiltrados = [...climatizacionHVAC];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas técnicas`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...climatizacionHVAC];
+      } else {
+        itemsFiltrados = climatizacionHVAC.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...climatizacionHVAC];
+      } else {
+        itemsFiltrados = climatizacionHVAC.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Carga directa de la lámina de reposición de aceite SP-10 y precauciones (Pág. 1613 / Sec. 21-6)
+      const initIdx = climatizacionHVAC.findIndex(i => i.pag === 1613);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Combustible y Emisiones K24Z1</title>
+  <style>
+    :root {
+      --bg-dark: #070a13;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --bg-elevated: #334155;
+      --fuel-amber: #f59e0b;
+      --fuel-glow: rgba(245, 158, 11, 0.35);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 370px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .brand-header {
+      padding: 12px 16px;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--fuel-amber);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--fuel-glow);
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .group-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--fuel-amber);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--fuel-amber); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--fuel-amber);
+      border-color: var(--fuel-amber);
+      color: #000;
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--fuel-amber);
+      color: #000;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="badge">PGM-FI</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Combustible y Emisiones (Sección 11)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar inyector, bomba, EVAP, sensor A/F, EGR, DTC...">
+      </div>
+
+      <select class="group-select" id="group-filter" onchange="filtrarGrupo(this.value)">
+        <option value="ALL">⛽ Todo Combustible y Emisiones</option>
+        <option value="SUPPLY">🛢️ Suministro, Bomba y Líneas</option>
+        <option value="PCM_PIN">🔌 Pinouts y Diagramas PCM (A, B, C)</option>
+        <option value="THROTTLE">⚡ Acelerador Electrónico y VTC/VTEC</option>
+        <option value="EVAP_EGR">🌱 Emisiones: EVAP, EGR y Catalizador</option>
+        <option value="DTC_DIAG">🔍 Diagnóstico y Guía DTC</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú Combustible</button>
+        <span id="sheet-title">Página 11-16</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Lámina Oficial de Combustible y Emisiones">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DE FUEL AND EMISSIONS (SECCIÓN 11)
+    const combustibleEmisiones = [
+      { grupo: "SUPPLY", sec: "11-2", pag: 266, titulo: "Herramientas Especiales: Combustible", desc: "Manómetros 07406-004000B, adaptadores de conexión rápida y llave de tuerca bomba." },
+      { grupo: "DTC_DIAG", sec: "11-3", pag: 267, titulo: "Estrategia de Diagnóstico y Uso del HDS", desc: "Procedimiento de escaneo en puerto DLC, Freeze Data y detección de fallas." },
+      { grupo: "DTC_DIAG", sec: "11-4", pag: 268, titulo: "Comandos de Borrado y Aprendizaje CKP", desc: "DTC Clear, PCM Reset y procedimiento de aprendizaje de posición de cigüeñal." },
+      { grupo: "DTC_DIAG", sec: "11-10", pag: 274, titulo: "Índice Maestro DTC: P0010 a P0340", desc: "Tabla oficial de códigos: Solenoide VTC, sensores MAF, MAP, ECT, A/F y fallos de cilindro." },
+      { grupo: "DTC_DIAG", sec: "11-11", pag: 275, titulo: "Índice Maestro DTC: P0341 a P0685", desc: "Códigos de desfasamiento leva-cigüeñal, sensores CMP, EGR, catalizador P0420 y fugas EVAP." },
+      { grupo: "DTC_DIAG", sec: "11-12", pag: 276, titulo: "Índice Maestro DTC: P0720 a P2252", desc: "Acelerador electrónico DBW (P2101, P2118, P2135, P2138) y sensores A/F de banda ancha." },
+      { grupo: "DTC_DIAG", sec: "11-14", pag: 278, titulo: "Diagnóstico por Síntomas: Motor no arranca", desc: "Verificación de presión de combustible (47-54 psi), chispa y líneas de vacío." },
+      { grupo: "PCM_PIN", sec: "11-16", pag: 280, titulo: "Descripción de la PCM y Modos de Autodiagnóstico", desc: "Lógica de 1 y 2 viajes (Drive Cycles), modo Self Shut Down (SSD) de 15 minutos." },
+      { grupo: "PCM_PIN", sec: "11-17", pag: 281, titulo: "Esquema de Alimentación y Fusibles de la PCM", desc: "Relé principal 1 y 2 (Fuel Pump), fusibles No. 19 (15A), No. 2 (15A) y No. 11 LAF." },
+      { grupo: "PCM_PIN", sec: "11-18", pag: 282, titulo: "Diagrama PCM: Inyectores 1-4 y Sensores MAF/MAP", desc: "Conexiones a inyectores (C5-C8), sensor MAP (C11), MAF (B30/B32) y ECT 1 (B23)." },
+      { grupo: "PCM_PIN", sec: "11-19", pag: 283, titulo: "Diagrama PCM: VTC, Bobinas, Válvula Purga y A/F", desc: "Pulsos de bobinas 1-4 (C15-C18), válvula de purga EVAP (B3) y sensor de oxígeno 2." },
+      { grupo: "PCM_PIN", sec: "11-20", pag: 284, titulo: "Diagrama PCM: Motor DBW y Sensor de Posición TP", desc: "Control de motor mariposa ETCSM+ / ETCSM- (C3/C4) y sensores TP A/B (C20/C21)." },
+      { grupo: "PCM_PIN", sec: "11-21", pag: 285, titulo: "Diagrama PCM: Sensor Pedal APP y Sensor FTP", desc: "Sensor pedal acelerador A/B (A17/A18), presión de tanque FTP (A26) y CAN-Bus." },
+      { grupo: "EVAP_EGR", sec: "11-23", pag: 287, titulo: "Ruteo de Mangueras de Vacío del Motor K24", desc: "Conexiones de válvula de purga EVAP y válvula térmica de bypass de aire de admisión." },
+      { grupo: "EVAP_EGR", sec: "11-24", pag: 288, titulo: "Diagrama de Distribución de Vacío Completo", desc: "Mapa general de vacío: Riel, regulador, canister, cánister vent shut y válvula PCV." },
+      { grupo: "PCM_PIN", sec: "11-25", pag: 289, titulo: "Pinout PCM Conector A (Terminales 4 al 23)", desc: "Relés de ventilador, sensor APP, relé A/C y sensor de carga eléctrica ELD." },
+      { grupo: "PCM_PIN", sec: "11-26", pag: 290, titulo: "Pinout PCM Conector A (Terminales 24 al 37)", desc: "Señales de pedal APP, sensor FTP, velocidad VSS y líneas CAN High / CAN Low." },
+      { grupo: "PCM_PIN", sec: "11-28", pag: 292, titulo: "Pinout PCM Conector B (Terminales 1 al 15)", desc: "Masa PG2, válvula EGR (B2), purga EVAP (B3), calefactor sensor 2 y bulbo de aceite." },
+      { grupo: "PCM_PIN", sec: "11-30", pag: 294, titulo: "Pinout PCM Conector B (Terminales 30 al 44)", desc: "Sensor MAF, temperatura IAT, solenoide VTEC VTS (B34) y control alternador." },
+      { grupo: "PCM_PIN", sec: "11-31", pag: 295, titulo: "Pinout PCM Conector C (Terminales 1 al 21)", desc: "Inyectores 1-4 (C5-C8), sensor MAP, bobinas IGPLS 1-4 y sensores TPS A/B." },
+      { grupo: "PCM_PIN", sec: "11-32", pag: 296, titulo: "Pinout PCM Conector C (Terminales 22 al 44)", desc: "Solenoide VTC (C23), sensores CMP A/B, sensor CKP (C32) y sensor de detonación KS." },
+      { grupo: "SUPPLY", sec: "11-33", pag: 297, titulo: "Inyección PGM-FI y Sensor A/F de Banda Ancha", desc: "Funcionamiento del sensor A/F planar previo al catalizador y sensores de temperatura." },
+      { grupo: "THROTTLE", sec: "11-35", pag: 299, titulo: "Acelerador Electrónico DBW y Sensor APP", desc: "Control de ralentí y aceleración por servomotor en cuerpo de mariposa sin chicote." },
+      { grupo: "SUPPLY", sec: "11-36", pag: 300, titulo: "Cuerpo de Mariposa y Control de Bomba de Gasolina", desc: "Corte de combustible en desaceleración (850 rpm) y sobre-revolución (6,700 rpm)." },
+      { grupo: "THROTTLE", sec: "11-37", pag: 301, titulo: "Lógica de Operación del Sistema i-VTEC / VTC", desc: "Fases de avance y retardo del árbol de admisión por presión de aceite según carga." },
+      { grupo: "EVAP_EGR", sec: "11-40", pag: 304, titulo: "Catalizador TWC y Sistema de Ventilación PCV", desc: "Conversión de emisiones en catalizador y recirculación de gases de cárter." },
+      { grupo: "EVAP_EGR", sec: "11-41", pag: 305, titulo: "Sistema EGR y Cánister EVAP", desc: "Válvula EGR de recirculación, cánister, válvula de purga y sensor de presión FTP." },
+      { grupo: "EVAP_EGR", sec: "11-42", pag: 306, titulo: "Mensaje 'CHECK FUEL CAP' y Fugas de Tapón", desc: "Protocolo de detección de tapón flojo o con fuga en el display del tablero." },
+      { grupo: "DTC_DIAG", sec: "11-57", pag: 321, titulo: "Criterios para Fijar Monitores OBD (Readiness)", desc: "Procedimiento de prueba de manejo para poner en estado 'Completado' el catalizador." },
+      { grupo: "DTC_DIAG", sec: "11-58", pag: 322, titulo: "Monitores EVAP y Sensor A/F (Readiness Codes)", desc: "Criterios de habilitación para prueba de fugas y monitoreo de sensores de oxígeno." },
+      { grupo: "DTC_DIAG", sec: "11-60", pag: 324, titulo: "Ubicación de Componentes PGM-FI en el Motor", desc: "Inyectores, sensores CKP, CMP, MAP, MAF, sensor de detonación y PCM." },
+      { grupo: "DTC_DIAG", sec: "11-61", pag: 325, titulo: "Ubicación Sensores de Oxígeno y Relé de Bomba", desc: "Sensor A/F en múltiple, sensor HO2S en catalizador y relé PGM-FI 2 en cabina." },
+      { grupo: "DTC_DIAG", sec: "11-62", pag: 326, titulo: "Diagnóstico DTC P0101: Sensor MAF", desc: "Prueba de flujo en ralentí (0.2 g/s o 0.5 V) y comprobación de ducto de aire." },
+      { grupo: "DTC_DIAG", sec: "11-106", pag: 370, titulo: "Diagnóstico DTC P0171 (Pobre) y P0172 (Rico)", desc: "Prueba de presión de riel (47-54 psi), fugas de vacío y flujo de aire a 4,500 rpm." },
+      { grupo: "SUPPLY", sec: "11-305", pag: 569, titulo: "Ubicación del Sistema de Combustible", desc: "Tanque de combustible, módulo de bomba, filtro, regulador y líneas de flujo." },
+      { grupo: "SUPPLY", sec: "11-317", pag: 581, titulo: "Procedimiento para Despresurizar Combustible", desc: "Retiro de fusible No. 2 (15A) de bomba y arranque hasta agotar la línea." },
+      { grupo: "SUPPLY", sec: "11-319", pag: 583, titulo: "Prueba de Presión de Combustible con Manómetro", desc: "Presión estándar: 320 a 370 kPa (47 a 54 psi). Verificación de regulador." },
+      { grupo: "SUPPLY", sec: "11-322", pag: 586, titulo: "Inspección de Líneas y Conectores Rápidos", desc: "Posicionamiento de abrazaderas y retenes de acople rápido en el riel." },
+      { grupo: "SUPPLY", sec: "11-324", pag: 588, titulo: "Retenes de Conectores Rápidos (Colores y Diámetros)", desc: "Retén verde (6.3 mm), azul verdoso (8 mm), blanco (9.5 mm) y naranja (9.5 mm)." },
+      { grupo: "SUPPLY", sec: "11-331", pag: 595, titulo: "Reemplazo de Filtro y Regulador de Presión", desc: "Desmontaje del módulo del tanque bajo los asientos traseros y sellos tóricos." },
+      { grupo: "EVAP_EGR", sec: "11-346", pag: 610, titulo: "Diagnóstico DTC P0420: Eficiencia de Catalizador", desc: "Prueba de crucero a 55 mph (88 km/h) con HDS monitoreando la tasa de conversión." },
+      { grupo: "EVAP_EGR", sec: "11-379", pag: 643, titulo: "Diagnóstico DTC P0455 y P0456: Fugas EVAP", desc: "Prueba con bomba de vacío de 0-30 in.Hg para detección de fuga mayor y menor." },
+      { grupo: "EVAP_EGR", sec: "11-382", pag: 646, titulo: "Diagnóstico DTC P0457: Fuga por Tapón de Gasolina", desc: "Inspección de la junta de goma del tapón (debe decir 'Tighten to click')." }
+    ];
+
+    let itemsFiltrados = [...combustibleEmisiones];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas técnicas`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false);
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarGrupo(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...combustibleEmisiones];
+      } else {
+        itemsFiltrados = combustibleEmisiones.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...combustibleEmisiones];
+      } else {
+        itemsFiltrados = combustibleEmisiones.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    window.onload = () => {
+      renderLista();
+      // Abre por defecto en el diagrama general de conectores PCM (Pág. 280 / Sec. 11-16)
+      const initIdx = combustibleEmisiones.findIndex(i => i.pag === 280);
+      seleccionarItem(initIdx >= 0 ? initIdx : 0);
+    };
+  </script>
+</body>
+</html>

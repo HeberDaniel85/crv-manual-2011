@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Sistema Eléctrico Completo</title>
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-surface: #111827;
+      --bg-card: #1f2937;
+      --bg-elevated: #374151;
+      --honda-red: #dc2626;
+      --amber: #f59e0b;
+      --cyan: #06b6d4;
+      --text-bright: #f9fafb;
+      --text-muted: #9ca3af;
+      --border: #374151;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL / LISTA */
+    #sidebar {
+      width: 360px;
+      min-width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 20;
+      transition: transform 0.25s ease;
+    }
+
+    .header {
+      padding: 12px 16px;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: var(--honda-red);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .title h1 { font-size: 0.95rem; font-weight: 700; }
+    .title p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .control-box {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .search-wrap { position: relative; }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .subsystem-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    #list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .item-card {
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .item-card.active {
+      background: rgba(220, 38, 38, 0.2);
+      border-color: var(--honda-red);
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .item-sec { font-size: 0.82rem; font-weight: bold; color: var(--cyan); }
+    .item-card.active .item-sec { color: var(--honda-red); }
+    .item-png { font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; color: var(--text-muted); }
+    .item-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+    .item-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* VISOR */
+    #main-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #020617;
+      position: relative;
+    }
+    #topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topbar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.primary {
+      background: var(--honda-red);
+      border-color: var(--honda-red);
+    }
+
+    #stage {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      -webkit-overflow-scrolling: touch;
+      background: #020617;
+    }
+    #sheet-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+    }
+
+    #toggle-list-btn {
+      display: none;
+      background: var(--honda-red);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+      #sidebar.hidden { transform: translateX(-100%); pointer-events: none; }
+      #toggle-list-btn { display: inline-block; }
+      #main-viewer { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL: ÍNDICE ELÉCTRICO -->
+  <aside id="sidebar">
+    <div class="header">
+      <div class="badge">ELEC</div>
+      <div class="title">
+        <h1>HONDA CR-V 2011</h1>
+        <p>Sistema Eléctrico (Motor y Carrocería)</p>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar fusible, relay, starter, sensor, tierra...">
+      </div>
+
+      <select class="subsystem-select" id="subsystem-filter" onchange="filtrarSubseccion(this.value)">
+        <option value="ALL">⚡ Todo el Sistema Eléctrico</option>
+        <option value="ENG_ELEC">🔋 Eléctrico del Motor (Sec. 4)</option>
+        <option value="BODY_FUSE">🔌 Fusibles y Relevadores (Sec. 22)</option>
+        <option value="BODY_GND">⏚ Distribución de Tierras (Grounds)</option>
+        <option value="BODY_HARN">🔀 Arneses y Conectores (Connectors)</option>
+        <option value="BODY_CTRL">💻 MICU, Inmovilizador y Luces</option>
+      </select>
+      <div style="font-size:0.7rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+        <span id="counter">0 láminas</span>
+        <span id="zoom-label">Zoom: 100%</span>
+      </div>
+    </div>
+
+    <div id="list-container"></div>
+  </aside>
+
+  <!-- ÁREA DE VISUALIZACIÓN -->
+  <main id="main-viewer">
+    <header id="topbar">
+      <div class="topbar-info">
+        <button id="toggle-list-btn" onclick="toggleSidebar(true)">☰ Menú Eléctrico</button>
+        <span id="sheet-title">Página 4-5</span>
+        <a id="btn-raw" class="tool-btn primary" href="#" target="_blank">↗ Ver PNG</a>
+      </div>
+      <div class="toolbar">
+        <button class="tool-btn" onclick="zoom(-0.2)">➖ Reducir</button>
+        <button class="tool-btn" onclick="zoom(0.2)">➕ Ampliar</button>
+        <button class="tool-btn" onclick="zoomReset()">⟲ 100%</button>
+        <button class="tool-btn" onclick="nav(-1)">◀ Ant.</button>
+        <button class="tool-btn" onclick="nav(1)">Sig. ▶</button>
+      </div>
+    </header>
+
+    <div id="stage">
+      <img id="sheet-img" src="" alt="Esquema Eléctrico Oficial Honda">
+    </div>
+  </main>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA DEL SISTEMA ELÉCTRICO COMPLETO
+    const sistemaElectrico = [
+      // SECCIÓN 4: MOTOR ELECTRICAL
+      { grupo: "ENG_ELEC", sec: "4-1", pag: 41, titulo: "Índice de Sistema Eléctrico de Motor", desc: "Arranque, Encendido, Carga, Alternador y Control Crucero." },
+      { grupo: "ENG_ELEC", sec: "4-2", pag: 42, titulo: "Herramientas Especiales", desc: "Adaptador e instalador para alternador/arranque." },
+      { grupo: "ENG_ELEC", sec: "4-3", pag: 43, titulo: "Ubicación de Componentes de Arranque", desc: "Starter, Starter Cut Relay, Transmission Range Switch." },
+      { grupo: "ENG_ELEC", sec: "4-4", pag: 44, titulo: "Diagnóstico: Motor no arranca o gira lento", desc: "Procedimiento de síntomas y caída de tensión." },
+      { grupo: "ENG_ELEC", sec: "4-5", pag: 45, titulo: "Diagrama Eléctrico de Arranque (Starter)", desc: "Fusible No.1 (100A), No.2 (50A), Starter Cut Relay y G401." },
+      { grupo: "ENG_ELEC", sec: "4-6", pag: 46, titulo: "Prueba de Circuito del Motor de Arranque", desc: "Prueba de consumo amperaje y verificación de cables." },
+      { grupo: "ENG_ELEC", sec: "4-8", pag: 48, titulo: "Prueba de Banco del Motor de Arranque", desc: "Corriente eléctrica sin carga: 80 A o menos." },
+      { grupo: "ENG_ELEC", sec: "4-9", pag: 49, titulo: "Desmontaje del Motor de Arranque", desc: "Retiro de cables terminal B y terminal S." },
+      { grupo: "ENG_ELEC", sec: "4-10", pag: 50, titulo: "Instalación y Torques del Motor de Arranque", desc: "Perno 10x1.25mm (44 N·m), perno 12x1.25mm (64 N·m), cable B (9 N·m)." },
+      { grupo: "ENG_ELEC", sec: "4-11", pag: 51, titulo: "Despiece Interno del Arranque (Overhaul)", desc: "Armadura, carbones, engranajes planetarios y horquilla." },
+      { grupo: "ENG_ELEC", sec: "4-16", pag: 56, titulo: "Ubicación Sistema de Encendido (Ignition)", desc: "Bobinas de encendido (Coils) y bujías (Spark Plugs)." },
+      { grupo: "ENG_ELEC", sec: "4-17", pag: 57, titulo: "Diagrama Eléctrico de Bobinas y Encendido", desc: "Conexiones a PCM (C15, C16, C17, C18) y tierra G101." },
+      { grupo: "ENG_ELEC", sec: "4-18", pag: 58, titulo: "Inspección de Tiempo de Encendido", desc: "8° ± 2° BTDC en ralentí (marca roja en polea)." },
+      { grupo: "ENG_ELEC", sec: "4-19", pag: 59, titulo: "Reemplazo de Bobinas de Encendido", desc: "Torque pernos de fijación de bobinas: 12 N·m (8.7 lbf·ft)." },
+      { grupo: "ENG_ELEC", sec: "4-20", pag: 60, titulo: "Inspección de Bujías (Iridio)", desc: "NGK IZFR6K11 / DENSO SKJ20DR-M11. Calibración: 1.0-1.1 mm. Torque: 18 N·m." },
+      { grupo: "ENG_ELEC", sec: "4-21", pag: 61, titulo: "Ubicación del Sistema de Carga", desc: "Alternador, sensor ELD, tensor de banda y luz de batería." },
+      { grupo: "ENG_ELEC", sec: "4-23", pag: 63, titulo: "Diagrama Eléctrico del Alternador", desc: "Terminales IG, C, L, FR a PCM y caja de fusibles." },
+      { grupo: "ENG_ELEC", sec: "4-26", pag: 66, titulo: "Prueba de Alternador y Regulador con VAT-40", desc: "Voltaje límite 13.5V - 15.1V, salida nominal: 105 A." },
+      { grupo: "ENG_ELEC", sec: "4-31", pag: 71, titulo: "Desmontaje del Tensor y Bomba Asistida", desc: "Perno polea tensora 10x1.25mm: 56 N·m (41 lbf·ft)." },
+      { grupo: "ENG_ELEC", sec: "4-32", pag: 72, titulo: "Desmontaje y Montaje del Alternador", desc: "Torque 3 pernos de fijación: 22 N·m (16 lbf·ft)." },
+      { grupo: "ENG_ELEC", sec: "4-34", pag: 74, titulo: "Despiece Interno del Alternador (Overhaul)", desc: "Tuerca de polea: 110 N·m (81 lbf·ft), rotor y carbones." },
+      { grupo: "ENG_ELEC", sec: "4-39", pag: 79, titulo: "Ubicación del Control de Crucero", desc: "Mandos de volante, interruptor de pedal de freno y PCM." },
+      { grupo: "ENG_ELEC", sec: "4-42", pag: 82, titulo: "Diagrama Eléctrico de Control de Crucero", desc: "Cableado de reloj contactor (cable reel) hacia PCM." },
+
+      // SECCIÓN 22: BODY ELECTRICAL
+      { grupo: "BODY_FUSE", sec: "22-7", pag: 1692, titulo: "Ubicación de Relevadores en Motor", desc: "A/C Clutch, Ventiladores, ETCS, Bobinas, FI Subrelay." },
+      { grupo: "BODY_HARN", sec: "22-13", pag: 1698, titulo: "Índice de Conectores y Arneses", desc: "Diagrama maestro de ruteo de cableados principales." },
+      { grupo: "BODY_HARN", sec: "22-16", pag: 1701, titulo: "Conectores del Arnés de Motor", desc: "Sensores CKP, CMP, VTC, Inyectores y solenoides A/T." },
+      { grupo: "BODY_HARN", sec: "22-22", pag: 1709, titulo: "Arnés del Compartimiento Motor (Izq.)", desc: "C301, C401, C501 y tierras maestras de chasis." },
+      { grupo: "BODY_FUSE", sec: "22-56", pag: 1741, titulo: "Caja de Fusibles del Motor (Under-hood)", desc: "Distribución de sockets, ELD, fusibles principales 1 a 23." },
+      { grupo: "BODY_FUSE", sec: "22-57", pag: 1742, titulo: "Caja de Fusibles del Tablero (Under-dash)", desc: "Conectores C, D, E, F, G, módulo MICU y fusibles internos." },
+      { grupo: "BODY_FUSE", sec: "22-58", pag: 1743, titulo: "Distribución de Alimentación (Power)", desc: "Circuitos conectados a batería directa (+B) y bajo switch (IG1/IG2)." },
+      { grupo: "BODY_GND", sec: "22-62", pag: 1747, titulo: "Índice Maestro de Tierras (Ground Distribution)", desc: "G1, G2, G101 (Motor), G201, G301, G302, G401, G501, G502, G601, G602." },
+      { grupo: "BODY_FUSE", sec: "22-63", pag: 1748, titulo: "Desmontaje Caja Fusibles de Motor", desc: "Precauciones de retiro de terminales de batería y alternador." },
+      { grupo: "BODY_FUSE", sec: "22-66", pag: 1751, titulo: "Prueba de Relevadores (Relay Test)", desc: "Prueba de continuidad en relevadores normalmente abiertos de 4 y 5 pines." },
+      { grupo: "BODY_CTRL", sec: "22-68", pag: 1753, titulo: "Prueba y Cambio del Interruptor de Encendido", desc: "Switch de encendido 7P: Posiciones OFF, ACC, ON, START." },
+      { grupo: "BODY_CTRL", sec: "22-106", pag: 1754, titulo: "Módulo MICU y Sistema Multiplex", desc: "Unidad multiplex integrada en caja de fusibles interna." },
+      { grupo: "BODY_CTRL", sec: "22-146", pag: 1768, titulo: "Diagrama de Luces Exteriores (Faros y Stops)", desc: "Control de faros altos/bajos, cuartos y switch de frenos." },
+      { grupo: "BODY_CTRL", sec: "22-190", pag: 1812, titulo: "Diagrama de Elevalunas (Power Windows)", desc: "Mando maestro del conductor y motores de puertas." },
+      { grupo: "BODY_CTRL", sec: "22-203", pag: 1825, titulo: "Diagrama de Limpiaparabrisas y Chisgueteros", desc: "Velocidades intermitente, baja, alta y motor lavador." },
+      { grupo: "BODY_CTRL", sec: "22-232", pag: 1854, titulo: "Diagrama del Cuadro de Instrumentos (Gauges)", desc: "Tacómetro, velocímetro, odómetro y comunicación CAN-Bus." },
+      { grupo: "BODY_CTRL", sec: "22-283", pag: 1968, titulo: "Diagrama del Desempañador Trasero", desc: "Líneas térmicas en medallón y espejos con calefacción." },
+      { grupo: "BODY_CTRL", sec: "22-288", pag: 1972, titulo: "Diagrama del Sistema Inmovilizador", desc: "Receptor de llave transponder e interfaz con PCM." }
+    ];
+
+    let itemsFiltrados = [...sistemaElectrico];
+    let indiceActual = 0;
+    let zoomLevel = 1.0;
+
+    function renderLista() {
+      const cont = document.getElementById('list-container');
+      cont.innerHTML = '';
+      document.getElementById('counter').textContent = `${itemsFiltrados.length} láminas eléctricas`;
+
+      itemsFiltrados.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `item-card ${idx === indiceActual ? 'active' : ''}`;
+        div.id = `item-${idx}`;
+        div.innerHTML = `
+          <div class="item-top">
+            <span class="item-sec">Sec. ${item.sec}</span>
+            <span class="item-png">pag_${item.pag}.png</span>
+          </div>
+          <div class="item-title">${item.titulo}</div>
+          <div class="item-desc">${item.desc}</div>
+        `;
+        div.onclick = () => {
+          seleccionarItem(idx);
+          toggleSidebar(false); // En móvil se oculta al seleccionar
+        };
+        cont.appendChild(div);
+      });
+    }
+
+    function seleccionarItem(idx) {
+      if (idx < 0 || idx >= itemsFiltrados.length) return;
+      indiceActual = idx;
+      const item = itemsFiltrados[idx];
+
+      document.getElementById('sheet-title').textContent = `Sec. ${item.sec} • Pág. ${item.pag}`;
+      const img = document.getElementById('sheet-img');
+      const rawUrl = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${item.pag}.png`;
+      img.src = rawUrl;
+      document.getElementById('btn-raw').href = rawUrl;
+
+      document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`item-${idx}`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      zoomReset();
+    }
+
+    function nav(delta) {
+      seleccionarItem(indiceActual + delta);
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(3.0, zoomLevel + delta));
+      document.getElementById('sheet-img').style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoom-label').textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('sheet-img').style.transform = `scale(1)`;
+      document.getElementById('zoom-label').textContent = `Zoom: 100%`;
+    }
+
+    function toggleSidebar(show) {
+      const sb = document.getElementById('sidebar');
+      if (show) sb.classList.remove('hidden');
+      else sb.classList.add('hidden');
+    }
+
+    function filtrarSubseccion(sub) {
+      if (sub === 'ALL') {
+        itemsFiltrados = [...sistemaElectrico];
+      } else {
+        itemsFiltrados = sistemaElectrico.filter(i => i.grupo === sub);
+      }
+      indiceActual = 0;
+      renderLista();
+      seleccionarItem(0);
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        itemsFiltrados = [...sistemaElectrico];
+      } else {
+        itemsFiltrados = sistemaElectrico.filter(i => 
+          i.sec.toLowerCase().includes(q) ||
+          i.pag.toString() === q ||
+          i.titulo.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q)
+        );
+      }
+      indiceActual = 0;
+      renderLista();
+      if (itemsFiltrados.length > 0) seleccionarItem(0);
+    });
+
+    // Iniciar con la primera lámina
+    window.onload = () => {
+      renderLista();
+      seleccionarItem(4); // Carga directa del diagrama de arranque (página 45 / 4-5)
+    };
+  </script>
+</body>
+</html>
