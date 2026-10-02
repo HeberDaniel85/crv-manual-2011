@@ -16,6 +16,7 @@
       --text-muted: #94a3b8;
       --border: #334155;
       --warning: #f59e0b;
+      --tool-color: #34d399;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -166,7 +167,7 @@
       font-size: 0.8rem;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
     .items-list {
       list-style: none;
@@ -185,6 +186,18 @@
       color: var(--cyan);
       font-weight: bold;
     }
+
+    .tools-box {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-left: 3px solid var(--tool-color);
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+      color: #cbd5e1;
+      font-size: 0.76rem;
+      line-height: 1.4;
+    }
+    .tools-box strong { color: var(--tool-color); display: block; margin-bottom: 2px; }
 
     .recommendation {
       background: rgba(15, 23, 42, 0.8);
@@ -231,7 +244,7 @@
       <h2>Manual de Servicio de Fábrica</h2>
       <p>Selecciona un módulo para abrir su ficha técnica interactiva en una pestaña nueva.</p>
       <div class="srs-notice">
-        <strong>* Nota de Seguridad SRS:</strong> Las secciones marcadas con asterisco (*) intervienen o conviven con componentes pirotécnicos de bolsas de aire y pretensores[span_3](start_span)[span_3](end_span)[span_4](start_span)[span_4](end_span). Esperar 3 minutos tras desconectar la batería antes de manipular conectores amarillos[span_5](start_span)[span_5](end_span).
+        <strong>* Nota de Seguridad SRS:</strong> Las secciones marcadas con asterisco (*) intervienen componentes pirotécnicos de bolsas de aire y pretensores[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span). Esperar 3 minutos tras desconectar la batería antes de intervenir conectores amarillos[span_6](start_span)[span_6](end_span).
       </div>
     </section>
 
@@ -249,13 +262,17 @@
         </div>
         <div class="module-content">
           <ul class="items-list">
-            <li>Identificación de chasis y VIN (RE3/RE4)[span_6](start_span)[span_6](end_span)</li>
+            <li>Identificación de chasis y VIN (RE3/RE4)</li>
             <li>Puntos de apoyo para elevador y gato hidráulico</li>
             <li>Reglas de seguridad y simbología técnica</li>
             <li>Abreviaturas y precauciones electrostáticas</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Gato hidráulico de patín (3 ton), torres de soporte con almohadillas de hule, linterna de inspección y cinta métrica.
+          </div>
           <div class="recommendation">
-            <strong>Recomendación:</strong> Confirma el 6.° y 8.° dígito del VIN para validar si el chasis corresponde a tracción 2WD o 4WD[span_7](start_span)[span_7](end_span).
+            <strong>Recomendación:</strong> Confirma el 6.° y 8.° dígito del VIN para validar si el chasis corresponde a tracción delantera (2WD) o integral (4WD).
           </div>
         </div>
       </a>
@@ -274,9 +291,13 @@
           <ul class="items-list">
             <li>Tabla general de pares de apriete estándar</li>
             <li>Luz de válvulas y compresión de cilindros K24</li>
-            <li>Capacidades exactas de fluidos OEM[span_8](start_span)[span_8](end_span)</li>
-            <li>Dimensiones, alineación y pesos del vehículo[span_9](start_span)[span_9](end_span)</li>
+            <li>Capacidades exactas de fluidos OEM[span_7](start_span)[span_7](end_span)</li>
+            <li>Dimensiones, alineación y pesos del vehículo[span_8](start_span)[span_8](end_span)</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Calibrador de láminas (feeler gauge) angular para válvulas, micrómetro de exteriores (0-25 mm y 25-50 mm) y torquímetro de 1/4" y 3/8".
+          </div>
           <div class="recommendation">
             <strong>Recomendación:</strong> Consulta siempre las tolerancias en frío antes de calibrar tren de válvulas o medir planitud de culata.
           </div>
@@ -295,11 +316,15 @@
         </div>
         <div class="module-content">
           <ul class="items-list">
-            <li>Intervalos del sistema Maintenance Minder[span_10](start_span)[span_10](end_span)[span_11](start_span)[span_11](end_span)</li>
+            <li>Intervalos del sistema Maintenance Minder</li>
             <li>Reemplazo de aceite de motor y filtro</li>
             <li>Inspección de bujías de iridio y filtro de aire</li>
             <li>Servicio de fluidos de frenos y diferencial Dual Pump</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Cubo 17 mm (tapón cárter), llave de copa para filtro de aceite (65 mm / 14 estrías), cubo para bujías 5/8" con imán/goma, cubos 10 mm y llave de trinquete 3/8" directa para tapones de diferencial.
+          </div>
           <div class="recommendation">
             <strong>Recomendación:</strong> En modelos 4WD, sustituye el fluido del diferencial trasero únicamente con Honda Dual Pump Fluid II para evitar vibraciones al girar en U.
           </div>
@@ -320,9 +345,13 @@
           <ul class="items-list">
             <li>Batería, motor de arranque y alternador</li>
             <li>Tensor automático de faja y diagrama de ruteo</li>
-            <li>Sistema de ignición directa y bobinas COP</li>
-            <li>Sensor de posición de cigüeñal (CKP) y levas (CMP)</li>
+            <li>Sistema de ignición directa y bobinas COP[span_9](start_span)[span_9](end_span)</li>
+            <li>Sensor de posición de cigüeñal (CKP) y levas (CMP)[span_10](start_span)[span_10](end_span)</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Llave plana o cubo largo 19 mm con barra extensora (para comprimir el tensor de faja), cubos 10 mm y 12 mm con extensiones de 3/8", cubo 14 mm (alternador/arranque) y multímetro digital.
+          </div>
           <div class="recommendation">
             <strong>Recomendación:</strong> Al revisar el tensor dinámico de la faja exterior, confirma que el indicador de desgaste coincida con la marca base del soporte.
           </div>
@@ -342,12 +371,16 @@
         <div class="module-content">
           <ul class="items-list">
             <li>Cadena de sincronización y tensor hidráulico</li>
-            <li>Calibración de válvulas y actuador VTC[span_12](start_span)[span_12](end_span)</li>
+            <li>Calibración de válvulas y actuador VTC</li>
             <li>Secuencia y torque en culata (pernos de estiramiento)</li>
             <li>Bomba de aceite, balanceadores y sellos de cigüeñal</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Cubo hexagonal 19 mm de impacto para polea de cigüeñal, herramienta inmovilizadora de polea Honda (50 mm), cubos de 10 mm, 12 mm y 14 mm (3/8" y 1/2"), cubo de 12 puntos para culata, goniómetro angular y alicate de seguros.
+          </div>
           <div class="recommendation">
-            <strong>Recomendación:</strong> Nunca liberes el pasador del tensor de cadena nuevo antes de haberlo atornillado a su torque final (12 N·m).
+            <strong>Recomendación:</strong> Nunca liberes el pasador del tensor de cadena nuevo antes de haberlo atornillado a su torque final (12 N·m)[span_11](start_span)[span_11](end_span).
           </div>
         </div>
       </a>
@@ -364,11 +397,15 @@
         </div>
         <div class="module-content">
           <ul class="items-list">
-            <li>Despiece y reemplazo de bomba de agua (6 pernos)[span_13](start_span)[span_13](end_span)</li>
-            <li>Termostato con jiggle valve y sensores ECT 1 y 2[span_14](start_span)[span_14](end_span)[span_15](start_span)[span_15](end_span)</li>
-            <li>Radiador, motoventiladores y depósito de reserva[span_16](start_span)[span_16](end_span)</li>
+            <li>Despiece y reemplazo de bomba de agua (6 pernos)[span_12](start_span)[span_12](end_span)</li>
+            <li>Termostato con jiggle valve y sensores ECT 1 y 2[span_13](start_span)[span_13](end_span)[span_14](start_span)[span_14](end_span)</li>
+            <li>Radiador, motoventiladores y depósito de reserva[span_15](start_span)[span_15](end_span)[span_16](start_span)[span_16](end_span)</li>
             <li>Purga térmica del circuito de refrigerante Type 2[span_17](start_span)[span_17](end_span)</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Cubo 10 mm y 12 mm con extensión flexible/rápida de 1/4" y 3/8", tenaza/alicate para abrazaderas elásticas de mangueras, embudo antiderrames para purga y torquímetro de precisión en rangos bajos.
+          </div>
           <div class="recommendation">
             <strong>Recomendación:</strong> Aprieta los 6 pernos de la bomba a 12 N·m (8.7 lbf·ft) y verifica que la válvula de purga del termostato quede siempre hacia arriba[span_18](start_span)[span_18](end_span).
           </div>
@@ -387,11 +424,15 @@
         </div>
         <div class="module-content">
           <ul class="items-list">
-            <li>Inyectores PGM-FI y riel de combustible[span_19](start_span)[span_19](end_span)</li>
-            <li>Cuerpo de aceleración electrónico (Drive-by-Wire)[span_20](start_span)[span_20](end_span)</li>
-            <li>Sistema EVAP, cánister y válvula de purga[span_21](start_span)[span_21](end_span)</li>
-            <li>Sensores de oxígeno primario A/F y secundario[span_22](start_span)[span_22](end_span)</li>
+            <li>Inyectores PGM-FI y riel de combustible</li>
+            <li>Cuerpo de aceleración electrónico (Drive-by-Wire)[span_19](start_span)[span_19](end_span)</li>
+            <li>Sistema EVAP, cánister y válvula de purga[span_20](start_span)[span_20](end_span)</li>
+            <li>Sensores de oxígeno primario A/F y secundario[span_21](start_span)[span_21](end_span)</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Cubo 22 mm ranurado especial para sensores de oxígeno (O2 Socket), cubos 8 mm, 10 mm y 12 mm, extensiones de 3/8", y desconectores plásticos para líneas rápidas de combustible.
+          </div>
           <div class="recommendation">
             <strong>Recomendación:</strong> Despresuriza el sistema quitando el fusible de la bomba antes de desacoplar los conectores rápidos del riel.
           </div>
@@ -405,16 +446,20 @@
           <div class="module-titles">
             <span class="sec-num">SECCIÓN 14</span><span class="srs-tag">* SRS</span>
             <div class="card-title">Transeje / Transmisión</div>
-            <div class="card-en">*Transaxle (A/T 5-Spd)[span_23](start_span)[span_23](end_span)[span_24](start_span)[span_24](end_span)</div>
+            <div class="card-en">*Transaxle (A/T 5-Spd)[span_22](start_span)[span_22](end_span)</div>
           </div>
         </div>
         <div class="module-content">
           <ul class="items-list">
-            <li>Solenoides de cambio y control de presión de embrague[span_25](start_span)[span_25](end_span)[span_26](start_span)[span_26](end_span)</li>
-            <li>Sensor de rango (TR Switch) y prueba de stall speed[span_27](start_span)[span_27](end_span)</li>
+            <li>Solenoides de cambio y control de presión de embrague[span_23](start_span)[span_23](end_span)</li>
+            <li>Sensor de rango (TR Switch) y prueba de stall speed[span_24](start_span)[span_24](end_span)</li>
             <li>Filtro en línea externo y tapón magnético de drenaje</li>
-            <li>Prueba de presión hidráulica en puertos de prueba[span_28](start_span)[span_28](end_span)</li>
+            <li>Prueba de presión hidráulica en puertos de prueba[span_25](start_span)[span_25](end_span)</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Mando de 3/8" directo sin cubo para tapón de drenaje de caja, cubos 10 mm y 12 mm largos con extensión de 10" (para solenoides), manómetro de presión de aceite de transmisión y alicate de abrazaderas.
+          </div>
           <div class="recommendation">
             <strong>Recomendación:</strong> Usa exclusivamente Honda ATF DW-1; el nivel se mide con el motor a temperatura de operación apagado entre 60 y 90 segundos.
           </div>
@@ -428,18 +473,22 @@
           <div class="module-titles">
             <span class="sec-num">SECCIÓN 17</span><span class="srs-tag">* SRS</span>
             <div class="card-title">Dirección Hidráulica</div>
-            <div class="card-en">*Steering[span_29](start_span)[span_29](end_span)</div>
+            <div class="card-en">*Steering[span_26](start_span)[span_26](end_span)</div>
           </div>
         </div>
         <div class="module-content">
           <ul class="items-list">
-            <li>Bomba hidráulica y despiece de paletas (Overhaul)[span_30](start_span)[span_30](end_span)</li>
+            <li>Bomba hidráulica y despiece de paletas (Overhaul)[span_27](start_span)[span_27](end_span)</li>
             <li>Cremallera de dirección y ajuste de cremallera guía</li>
-            <li>Manguera de alta presión y switch de presión PSP[span_31](start_span)[span_31](end_span)</li>
+            <li>Manguera de alta presión y switch de presión PSP[span_28](start_span)[span_28](end_span)[span_29](start_span)[span_29](end_span)</li>
             <li>Columna de dirección y juntas cardán inferiores</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Cubo 19 mm o 22 mm para tuerca de polea de bomba, inmovilizador de polea especial OEM 07ZAB-S5A0100[span_30](start_span)[span_30](end_span), cubos 10 mm, 12 mm y 14 mm, llaves de línea/freno para racores y cubo hexagonal grande de 40 mm para guía de cremallera.
+          </div>
           <div class="recommendation">
-            <strong>Recomendación:</strong> Aprieta la tuerca de polea de la bomba a 64 N·m (47 lbf·ft) y usa siempre O-rings nuevos lubricados con fluido Honda PSF genuino[span_32](start_span)[span_32](end_span).
+            <strong>Recomendación:</strong> Aprieta la tuerca de polea de la bomba a 64 N·m (47 lbf·ft) y usa siempre O-rings nuevos lubricados con fluido Honda PSF genuino[span_31](start_span)[span_31](end_span).
           </div>
         </div>
       </a>
@@ -451,7 +500,7 @@
           <div class="module-titles">
             <span class="sec-num">SECCIÓN 18</span>
             <div class="card-title">Suspensión (con TPMS)</div>
-            <div class="card-en">Suspension (Including TPMS)[span_33](start_span)[span_33](end_span)</div>
+            <div class="card-en">Suspension (Including TPMS)[span_32](start_span)[span_32](end_span)</div>
           </div>
         </div>
         <div class="module-content">
@@ -459,8 +508,12 @@
             <li>Amortiguadores MacPherson delanteros y multilink trasero</li>
             <li>Bujes de horquilla inferior y rótulas de suspensión</li>
             <li>Barras estabilizadoras y terminales de enlace</li>
-            <li>Sensores de presión de llantas TPMS y programación[span_34](start_span)[span_34](end_span)</li>
+            <li>Sensores de presión de llantas TPMS y programación[span_33](start_span)[span_33](end_span)</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Pistola de impacto con cubos 17 mm y 19 mm, llave hexagonal (Allen) de 5 mm y 6 mm combinada con llave estriada 14 mm/17 mm (para terminales de barra estabilizadora), extractor de rótulas tipo guillotina/mandíbula y prensa de resortes.
+          </div>
           <div class="recommendation">
             <strong>Recomendación:</strong> Los pernos de bujes de horquilla y brazos traseros deben apretarse con el peso del vehículo sobre sus cuatro ruedas en el suelo.
           </div>
@@ -474,16 +527,20 @@
           <div class="module-titles">
             <span class="sec-num">SECCIÓN 19</span>
             <div class="card-title">Frenos (con VSA)</div>
-            <div class="card-en">Brakes (Including VSA)[span_35](start_span)[span_35](end_span)</div>
+            <div class="card-en">Brakes (Including VSA)[span_34](start_span)[span_34](end_span)</div>
           </div>
         </div>
         <div class="module-content">
           <ul class="items-list">
             <li>Calipers delanteros de doble pistón y traseros de disco</li>
             <li>Freno de estacionamiento de tambor integrado interno</li>
-            <li>Módulo modulador ABS/VSA y purga de microburbujas[span_36](start_span)[span_36](end_span)[span_37](start_span)[span_37](end_span)</li>
-            <li>Sensores de velocidad de rueda y sensor Yaw/aceleración[span_38](start_span)[span_38](end_span)[span_39](start_span)[span_39](end_span)[span_40](start_span)[span_40](end_span)</li>
+            <li>Módulo modulador ABS/VSA y purga de microburbujas[span_35](start_span)[span_35](end_span)</li>
+            <li>Sensores de velocidad de rueda y sensor Yaw/aceleración[span_36](start_span)[span_36](end_span)</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Destornillador de impacto manual con punta Phillips #3 (para tornillos de discos), cubos 12 mm y 14 mm (guías de mordaza), cubos 17 mm y 19 mm (soportes de mordaza), llave de purga de 10 mm y retrocededor de pistones de freno.
+          </div>
           <div class="recommendation">
             <strong>Recomendación:</strong> Reemplaza el líquido con DOT 3 o DOT 4 cada 3 años; purga en cruz iniciando por la rueda más lejana a la bomba maestra.
           </div>
@@ -497,18 +554,22 @@
           <div class="module-titles">
             <span class="sec-num">SECCIÓN 20</span><span class="srs-tag">* SRS</span>
             <div class="card-title">Carrocería</div>
-            <div class="card-en">*Body[span_41](start_span)[span_41](end_span)</div>
+            <div class="card-en">*Body[span_37](start_span)[span_37](end_span)</div>
           </div>
         </div>
         <div class="module-content">
           <ul class="items-list">
-            <li>Desmontaje y alineación de compuerta trasera y puertas[span_42](start_span)[span_42](end_span)</li>
-            <li>Mecanismos elevalunas, chapas y actuadores de seguros[span_43](start_span)[span_43](end_span)</li>
-            <li>Estructura del tablero central y viga de dirección[span_44](start_span)[span_44](end_span)</li>
-            <li>Asientos delanteros con reposacabezas activos[span_45](start_span)[span_45](end_span)</li>
+            <li>Desmontaje y alineación de compuerta trasera y puertas</li>
+            <li>Mecanismos elevalunas, chapas y actuadores de seguros</li>
+            <li>Estructura del tablero central y viga de dirección</li>
+            <li>Asientos delanteros con reposacabezas activos</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Juego de palancas de nylon/plástico para grapas y molduras, cubo 14 mm (anclajes de asientos al piso), cubos 10 mm y 12 mm con extensiones, y puntas Torx T25/T30.
+          </div>
           <div class="recommendation">
-            <strong>Recomendación:</strong> Al desmontar respaldos o consolas, desconecta los módulos de bolsas de aire laterales para evitar disparos accidentales[span_46](start_span)[span_46](end_span).
+            <strong>Recomendación:</strong> Al desmontar respaldos o consolas, desconecta los módulos de bolsas de aire laterales para evitar disparos accidentales[span_38](start_span)[span_38](end_span).
           </div>
         </div>
       </a>
@@ -520,7 +581,7 @@
           <div class="module-titles">
             <span class="sec-num">SECCIÓN 21</span><span class="srs-tag">* SRS</span>
             <div class="card-title">Climatización (HVAC)</div>
-            <div class="card-en">*Heating & A/C[span_47](start_span)[span_47](end_span)</div>
+            <div class="card-en">*Heating & A/C[span_39](start_span)[span_39](end_span)</div>
           </div>
         </div>
         <div class="module-content">
@@ -528,10 +589,14 @@
             <li>Compresor de A/C, embrague magnético y relé</li>
             <li>Evaporador, válvula de expansión y núcleo calefactor</li>
             <li>Motores actuadores de compuertas de mezcla de aire</li>
-            <li>Carga de refrigerante R-134a y aceite ND-OIL 8[span_48](start_span)[span_48](end_span)</li>
+            <li>Carga de refrigerante R-134a y aceite ND-OIL 8</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Estación/manómetros de A/C y bomba de vacío, cubos 10 mm y 12 mm (tornillos de compresor y mangueras), calibrador de galgas (para holgura del embrague) y alicate de seguros Seeger para polea.
+          </div>
           <div class="recommendation">
-            <strong>Recomendación:</strong> Carga exactamente 440 a 490 g de R-134a[span_49](start_span)[span_49](end_span); la holgura del embrague del compresor debe calibrarse entre 0.35 y 0.60 mm.
+            <strong>Recomendación:</strong> Carga exactamente 440 a 490 g de R-134a; la holgura del embrague del compresor debe calibrarse entre 0.35 y 0.60 mm.
           </div>
         </div>
       </a>
@@ -543,18 +608,22 @@
           <div class="module-titles">
             <span class="sec-num">SECCIÓN 22</span><span class="srs-tag">* SRS</span>
             <div class="card-title">Eléctrico de Carrocería</div>
-            <div class="card-en">*Body Electrical[span_50](start_span)[span_50](end_span)</div>
+            <div class="card-en">*Body Electrical[span_40](start_span)[span_40](end_span)</div>
           </div>
         </div>
         <div class="module-content">
           <ul class="items-list">
-            <li>Cajas de fusibles bajo capó y bajo tablero (MICU)[span_51](start_span)[span_51](end_span)[span_52](start_span)[span_52](end_span)</li>
-            <li>Redes de comunicación B-CAN (33.3 kbps) y F-CAN[span_53](start_span)[span_53](end_span)[span_54](start_span)[span_54](end_span)</li>
-            <li>Sistema de inmovilizador y control remoto de llaves[span_55](start_span)[span_55](end_span)</li>
-            <li>Luces principales, direccionales y limpiaparabrisas[span_56](start_span)[span_56](end_span)[span_57](start_span)[span_57](end_span)</li>
+            <li>Cajas de fusibles bajo capó y bajo tablero (MICU)[span_41](start_span)[span_41](end_span)</li>
+            <li>Redes de comunicación B-CAN (33.3 kbps) y F-CAN[span_42](start_span)[span_42](end_span)</li>
+            <li>Sistema de inmovilizador y control remoto de llaves[span_43](start_span)[span_43](end_span)</li>
+            <li>Luces principales, direccionales y limpiaparabrisas[span_44](start_span)[span_44](end_span)</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Multímetro digital de alta impedancia (10 MΩ mínimo), pinza extractora de mini-fusibles, cubos 10 mm (tierras de chasis) y destornillador Phillips #2 corto.
+          </div>
           <div class="recommendation">
-            <strong>Recomendación:</strong> Nunca pruebes los circuitos de la unidad MICU con lámparas de prueba incandescentes; usa siempre multímetro de alta impedancia[span_58](start_span)[span_58](end_span).
+            <strong>Recomendación:</strong> Nunca pruebes los circuitos de la unidad MICU con lámparas de prueba incandescentes; usa siempre multímetro de alta impedancia.
           </div>
         </div>
       </a>
@@ -566,16 +635,20 @@
           <div class="module-titles">
             <span class="sec-num">SECCIÓN 23</span><span class="srs-tag">* SRS</span>
             <div class="card-title">Audio y Navegación</div>
-            <div class="card-en">*Audio, Nav & Telematics[span_59](start_span)[span_59](end_span)</div>
+            <div class="card-en">*Audio, Nav & Telematics[span_45](start_span)[span_45](end_span)</div>
           </div>
         </div>
         <div class="module-content">
           <ul class="items-list">
-            <li>Unidad de cabecera estéreo y diagrama de conectores[span_60](start_span)[span_60](end_span)</li>
-            <li>Controles remotos en el volante y cable espiral[span_61](start_span)[span_61](end_span)[span_62](start_span)[span_62](end_span)</li>
+            <li>Unidad de cabecera estéreo y diagrama de conectores</li>
+            <li>Controles remotos en el volante y cable espiral</li>
             <li>Antena, amplificador y cableado de parlantes</li>
-            <li>Cámara de reversa y bus de datos GA-Net[span_63](start_span)[span_63](end_span)</li>
+            <li>Cámara de reversa y bus de datos GA-Net</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Espátulas plásticas de desmontaje de molduras de tablero, cubo 8 mm con extensión larga (pernos inferiores del estéreo tras el panel de clima) y destornillador imantado Phillips #2.
+          </div>
           <div class="recommendation">
             <strong>Recomendación:</strong> Al desmontar el estéreo en versiones con pantalla o radio OEM, ten a mano la tarjeta con el código antirrobo de 5 dígitos.
           </div>
@@ -589,18 +662,22 @@
           <div class="module-titles">
             <span class="sec-num">SECCIÓN 24</span><span class="srs-tag">* SRS</span>
             <div class="card-title">Sistemas de Retención (SRS)</div>
-            <div class="card-en">*Restraints & Airbags[span_64](start_span)[span_64](end_span)[span_65](start_span)[span_65](end_span)</div>
+            <div class="card-en">*Restraints & Airbags[span_46](start_span)[span_46](end_span)[span_47](start_span)[span_47](end_span)</div>
           </div>
         </div>
         <div class="module-content">
           <ul class="items-list">
-            <li>Bolsas de aire frontales, laterales y tipo cortina[span_66](start_span)[span_66](end_span)</li>
-            <li>Pretensores pirotécnicos de cinturones delanteros[span_67](start_span)[span_67](end_span)</li>
-            <li>Sensores de impacto frontales y de pilar central[span_68](start_span)[span_68](end_span)</li>
-            <li>Cable espiral (Reel Cable) y unidad central SRS[span_69](start_span)[span_69](end_span)</li>
+            <li>Bolsas de aire frontales, laterales y tipo cortina[span_48](start_span)[span_48](end_span)</li>
+            <li>Pretensores pirotécnicos de cinturones delanteros[span_49](start_span)[span_49](end_span)</li>
+            <li>Sensores de impacto frontales y de pilar central[span_50](start_span)[span_50](end_span)</li>
+            <li>Cable espiral (Reel Cable) y unidad central SRS[span_51](start_span)[span_51](end_span)</li>
           </ul>
+          <div class="tools-box">
+            <strong>Herramientas y Cubos:</strong>
+            Puntas Torx de seguridad T30 (para pernos del airbag de volante), cubo 14 mm (pernos de anclaje de cinturones y pretensores), cubo 10 mm (desconexión de borne de batería) y conectores simuladores de prueba SRS (resistencias de 2.0 Ω).
+          </div>
           <div class="recommendation">
-            <strong>Recomendación:</strong> Prohibido medir continuidad o resistencia con multímetro en bolsas o pretensores; la corriente del probador puede activarlos[span_70](start_span)[span_70](end_span).
+            <strong>Recomendación:</strong> Prohibido medir continuidad o resistencia con multímetro en bolsas o pretensores; la corriente del probador puede activarlos[span_52](start_span)[span_52](end_span).
           </div>
         </div>
       </a>
@@ -609,7 +686,7 @@
   </main>
 
   <footer>
-    Honda Motor Co., Ltd. • Manual de Taller y Servicio Oficial • 3.ª Generación (RE3/RE4)[span_71](start_span)[span_71](end_span)
+    Honda Motor Co., Ltd. • Manual de Taller y Servicio Oficial • 3.ª Generación (RE3/RE4)
   </footer>
 
 </body>
