@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>CR-V 2011 - Visor Maestro Global (Págs 1 - 2317)</title>
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --honda-red: #dc2626;
+      --cyan: #38bdf8;
+      --amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      background: var(--bg-surface);
+      border-bottom: 2px solid var(--honda-red);
+      padding: 10px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      z-index: 30;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    }
+
+    .brand-wrap { display: flex; align-items: center; gap: 10px; }
+    .badge-master {
+      background: var(--honda-red);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .brand-titles h1 { font-size: 0.95rem; font-weight: 800; }
+    .brand-titles p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .page-input-box {
+      display: flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      gap: 6px;
+    }
+    .page-input-box label { font-size: 0.75rem; color: var(--cyan); font-weight: bold; }
+    #pageInput {
+      width: 60px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: bold;
+      text-align: center;
+      outline: none;
+    }
+    .page-total { font-size: 0.75rem; color: var(--text-muted); }
+
+    .btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn:hover { background: #334155; }
+    .btn-red { background: var(--honda-red); border-color: var(--honda-red); }
+    .btn-red:hover { background: #b91c1c; }
+
+    /* PANEL DE BÚSQUEDA FLOTANTE */
+    #searchBar {
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 14px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    #searchQuery {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    #searchResults {
+      max-height: 220px;
+      overflow-y: auto;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      display: none;
+    }
+    .result-item {
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+    .result-item:hover { background: var(--bg-card); }
+    .res-page { color: var(--cyan); font-weight: bold; }
+    .res-snippet { color: var(--text-muted); font-size: 0.72rem; margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 70%; }
+
+    /* ÁREA DEL VISOR */
+    #stage {
+      flex: 1;
+      overflow: auto;
+      background: #020617;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 12px;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+    #manualImg {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      transform-origin: top center;
+      transition: transform 0.1s ease-out;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    }
+
+    #loadingText {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--cyan);
+      font-weight: bold;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-wrap">
+      <div class="badge-master">GLOBAL 2317</div>
+      <div class="brand-titles">
+        <h1>HONDA CR-V 2011 • Visor Maestro</h1>
+        <p>Búsqueda por Sección (ej. 22-203), Página Física o Texto</p>
+      </div>
+    </div>
+
+    <div class="nav-controls">
+      <div class="page-input-box">
+        <label for="pageInput">Pág:</label>
+        <input type="number" id="pageInput" min="1" max="2317" value="1885" onchange="irAPagina(this.value)">
+        <span class="page-total">/ 2317</span>
+      </div>
+
+      <button class="btn" onclick="cambiarPagina(-1)">◀ Ant.</button>
+      <button class="btn" onclick="cambiarPagina(1)">Sig. ▶</button>
+      <button class="btn" onclick="zoom(-0.25)">➖</button>
+      <button class="btn" onclick="zoom(0.25)">➕</button>
+      <button class="btn" onclick="zoomReset()">100%</button>
+      <a id="btnRaw" class="btn btn-red" href="#" target="_blank">↗ Ver PNG</a>
+      <a href="index.html" class="btn">🏠 Menú</a>
+    </div>
+  </header>
+
+  <div id="searchBar">
+    <input type="text" id="searchQuery" placeholder="🔍 Buscar por sección (ej. 22-203, 10-5), componente (washer, pump, wiper) o texto..." onkeydown="if(event.key==='Enter') ejecutarBusqueda()">
+    <button class="btn btn-red" onclick="ejecutarBusqueda()">Buscar</button>
+  </div>
+
+  <div id="searchResults"></div>
+
+  <div id="stage">
+    <div id="loadingText">Cargando lámina...</div>
+    <img id="manualImg" src="" alt="Lámina técnica Honda CR-V 2011" onload="ocultarLoader()">
+  </div>
+
+  <script>
+    let paginaActual = 1885; // Inicializa en la sección de limpiaparabrisas / lavador
+    let zoomLevel = 1.0;
+    let datosIndice = [];
+
+    // Cargar indice_crv.json si está disponible
+    fetch('indice_crv.json')
+      .then(res => res.json())
+      .then(data => {
+        datosIndice = data;
+        console.log(`Índice cargado con ${datosIndice.length} páginas.`);
+      })
+      .catch(err => console.log('Búsqueda por texto local deshabilitada o en modo archivo:', err));
+
+    function cargarLamina(pag) {
+      pag = parseInt(pag);
+      if (isNaN(pag) || pag < 1) pag = 1;
+      if (pag > 2317) pag = 2317;
+      paginaActual = pag;
+
+      document.getElementById('pageInput').value = pag;
+      document.getElementById('loadingText').style.display = 'block';
+
+      const url = `https://raw.githubusercontent.com/HeberDaniel85/crv-manual-2011/main/imagenes/pag_${pag}.png`;
+      const img = document.getElementById('manualImg');
+      img.src = url;
+
+      document.getElementById('btnRaw').href = url;
+    }
+
+    function ocultarLoader() {
+      document.getElementById('loadingText').style.display = 'none';
+    }
+
+    function cambiarPagina(delta) {
+      cargarLamina(paginaActual + delta);
+    }
+
+    function irAPagina(val) {
+      cargarLamina(parseInt(val));
+    }
+
+    function zoom(delta) {
+      zoomLevel = Math.max(0.5, Math.min(3.5, zoomLevel + delta));
+      document.getElementById('manualImg').style.transform = `scale(${zoomLevel})`;
+    }
+
+    function zoomReset() {
+      zoomLevel = 1.0;
+      document.getElementById('manualImg').style.transform = `scale(1)`;
+    }
+
+    function ejecutarBusqueda() {
+      const q = document.getElementById('searchQuery').value.trim().toLowerCase();
+      const cont = document.getElementById('searchResults');
+      cont.innerHTML = '';
+
+      if (!q) {
+        cont.style.display = 'none';
+        return;
+      }
+
+      // Si el usuario escribió directamente un número puro, ir a esa página
+      if (!isNaN(q) && parseInt(q) >= 1 && parseInt(q) <= 2317) {
+        cargarLamina(parseInt(q));
+        cont.style.display = 'none';
+        return;
+      }
+
+      if (!datosIndice || datosIndice.length === 0) {
+        alert('El archivo indice_crv.json aún se está cargando o no se encuentra en el directorio.');
+        return;
+      }
+
+      // Filtrar coincidencias en el campo "Texto" o número de página
+      const matches = datosIndice.filter(item => {
+        const texto = (item.Texto || '').toLowerCase();
+        return texto.includes(q) || item.Pagina.toString() === q;
+      }).slice(0, 50); // Primeros 50 resultados
+
+      if (matches.length === 0) {
+        cont.innerHTML = `<div style="padding:10px 14px; font-size:0.8rem; color:#f87171;">No se encontraron resultados para "${q}". Intenta con términos en inglés (ej. "washer", "wiper", "22-203").</div>`;
+        cont.style.display = 'block';
+        return;
+      }
+
+      matches.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'result-item';
+        
+        // Extraer snippet de contexto
+        let snippet = item.Texto || '';
+        const idx = snippet.toLowerCase().indexOf(q);
+        if (idx !== -1) {
+          const start = Math.max(0, idx - 30);
+          const end = Math.min(snippet.length, idx + 60);
+          snippet = '...' + snippet.substring(start, end).replace(/\n/g, ' ') + '...';
+        } else {
+          snippet = snippet.substring(0, 60);
+        }
+
+        div.innerHTML = `
+          <div><span class="res-page">Pág. ${item.Pagina}</span> <span class="res-snippet">${snippet}</span></div>
+          <span style="color:var(--amber); font-size:0.75rem;">Abrir ↗</span>
+        `;
+        div.onclick = () => {
+          cargarLamina(item.Pagina);
+          cont.style.display = 'none';
+        };
+        cont.appendChild(div);
+      });
+
+      cont.style.display = 'block';
+    }
+
+    // Teclas de atajo: flecha izquierda (anterior), flecha derecha (siguiente)
+    window.addEventListener('keydown', (e) => {
+      if (document.activeElement.tagName === 'INPUT') return;
+      if (e.key === 'ArrowLeft') cambiarPagina(-1);
+      if (e.key === 'ArrowRight') cambiarPagina(1);
+    });
+
+    window.onload = () => {
+      // Cargar la página inicial (1885 - Diagrama del lavador / limpiaparabrisas)
+      cargarLamina(1885);
+    };
+  </script>
+</body>
+</html>

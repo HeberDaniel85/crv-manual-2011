@@ -17,6 +17,7 @@
       --border: #334155;
       --warning: #f59e0b;
       --tool-color: #34d399;
+      --gold: #fbbf24;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -137,6 +138,27 @@
     .module-card.has-srs::before { background: var(--warning); }
     .module-card.has-srs:hover::before { background: var(--honda-red); }
 
+    /* TARJETA MAESTRA DESTACADA */
+    .module-card.card-master {
+      border: 2px solid var(--gold);
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 1));
+      box-shadow: 0 0 15px rgba(251, 191, 36, 0.25);
+    }
+    .module-card.card-master::before { background: var(--gold); }
+    .module-card.card-master:hover {
+      border-color: #fde047;
+      box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+    }
+    .master-tag {
+      background: var(--gold);
+      color: #000;
+      font-weight: 900;
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
     .module-header {
       display: flex;
       align-items: center;
@@ -154,6 +176,7 @@
       flex-shrink: 0;
     }
     .thumb-icon svg { width: 26px; height: 26px; fill: var(--text-main); }
+    .thumb-icon.gold-icon svg { fill: var(--gold); }
 
     .module-titles { flex: 1; min-width: 0; }
     .sec-num { font-size: 0.72rem; font-weight: 700; color: var(--cyan); letter-spacing: 0.5px; }
@@ -209,6 +232,7 @@
     }
     .recommendation strong { color: #f8fafc; }
     .module-card.has-srs .recommendation { border-left-color: var(--warning); }
+    .module-card.card-master .recommendation { border-left-color: var(--gold); color: #fef08a; }
 
     footer {
       background: var(--bg-surface);
@@ -242,13 +266,36 @@
   <main>
     <section class="banner">
       <h2>Manual de Servicio de Fabrica</h2>
-      <p>Selecciona un modulo para abrir su ficha tecnica interactiva en una pestana nueva.</p>
+      <p>Selecciona un modulo para abrir su ficha tecnica interactiva en una pestana nueva o utiliza el Visor Global Maestro para hojear todas las hojas.</p>
       <div class="srs-notice">
         <strong>* Nota de Seguridad SRS:</strong> Las secciones marcadas con asterisco intervienen componentes pirotecnicos de bolsas de aire y pretensores. Esperar 3 minutos tras desconectar la bateria antes de manipular conectores amarillos.
       </div>
     </section>
 
     <div class="modules-list">
+
+      <!-- TARJETA DESTACADA: VISOR GLOBAL MAESTRO -->
+      <a href="VisorGlobalCRV.html" target="_blank" class="module-card card-master">
+        <div class="module-header">
+          <div class="thumb-icon gold-icon"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div>
+          <div class="module-titles">
+            <span class="master-tag">BUSCADOR MAESTRO</span>
+            <div class="card-title" style="color:var(--gold);">Visor Global Completo (Páginas 1 a 2,317)</div>
+            <div class="card-en">Full Factory Service Manual Browser</div>
+          </div>
+        </div>
+        <div class="module-content">
+          <ul class="items-list">
+            <li>Navegación continua página por página (◀ Ant / Sig ▶) sin saltos de temas</li>
+            <li>Búsqueda por código de sección técnica (ej. 22-203, 10-5, 17-15)</li>
+            <li>Salto directo por número de página física (1 a 2317)</li>
+            <li>Búsqueda universal de texto en todo el manual de taller</li>
+          </ul>
+          <div class="recommendation">
+            <strong>Uso recomendado:</strong> Utiliza este visor maestro cuando necesites revisar procedimientos completos de principio a fin (como las pruebas de la bomba de agua del lavaparabrisas entre las páginas 1885 y 1902) sin restricciones de módulo.
+          </div>
+        </div>
+      </a>
 
       <!-- 1. Informacion General -->
       <a href="InformacionGeneralCRV.html" target="_blank" class="module-card">
